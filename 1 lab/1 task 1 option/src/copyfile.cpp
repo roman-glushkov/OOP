@@ -1,28 +1,37 @@
 #include <iostream>
 #include <fstream>
 
-using namespace std;
+const int REQUIRED_ARGS_COUNT = 3;
+
+const std::string ERROR_INVALID_ARGS = "Invalid arguments count\n";
+const std::string ERROR_READ_OPEN = "Failed to open ";
+const std::string ERROR_READ_OPEN_END = " for reading\n";
+const std::string ERROR_WRITE_OPEN = "Failed to open ";
+const std::string ERROR_WRITE_OPEN_END = " for writing\n";
+const std::string ERROR_WRITE_FAILED = "Failed to save data on disk\n";
+const std::string ERROR_READ_FAILED = "Failed to read data from input file\n";
+const std::string USAGE_MESSAGE = "Usage: copyfile.exe <input file> <output file>\n";
 
 int main(int argc, char * argv[])
 {
-    if (argc != 3)
+    if (argc != REQUIRED_ARGS_COUNT)
     {
-        cout << "Invalid arguments count\n"
-             << "Usage: copyfile.exe <input file> <output file>\n";
+        std::cout << ERROR_INVALID_ARGS
+             << USAGE_MESSAGE;
         return 1;
     }
 
-    ifstream input(argv[1]);
+    std::ifstream input(argv[1]);
     if (!input.is_open())
     {
-        cout << "Failed to open " << argv[1] << " for reading\n";
+        std::cout << ERROR_READ_OPEN << argv[1] << ERROR_READ_OPEN_END;
         return 1;
     }
 
-    ofstream output(argv[2]);
+    std::ofstream output(argv[2]);
     if (!output.is_open())
     {
-        cout << "Failed to open " << argv[2] << " for writing\n";
+        std::cout << ERROR_WRITE_OPEN << argv[2] << ERROR_WRITE_OPEN_END;
         return 1;
     }
 
@@ -32,20 +41,18 @@ int main(int argc, char * argv[])
     {
         if (!output.put(ch))
         {
-            cout << "Failed to save data on disk\n";
+            std::cout << ERROR_WRITE_FAILED;
             return 1;
         }
     }
-
     if (!input.eof())
     {
-        cout << "Failed to read data from input file\n";
+        std::cout << ERROR_READ_FAILED;
         return 1;
     }
-
     if (!output.flush())
     {
-        cout << "Failed to save data on disk\n";
+        std::cout << ERROR_WRITE_FAILED;
         return 1;
     }
 
