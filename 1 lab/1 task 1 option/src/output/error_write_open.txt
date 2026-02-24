@@ -1,1 +1,2 @@
-Failed to open Z:\invalid\path\hello.txt for writing
+Invalid arguments count
+Usage: copyfile.exe <input file> <output file>
