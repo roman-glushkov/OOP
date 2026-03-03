@@ -1,0 +1,4 @@
+Usage:
+  bin2dec.exe <binary_number>
+  bin2dec.exe -h
+  bin2dec.exe (then input from stdin)

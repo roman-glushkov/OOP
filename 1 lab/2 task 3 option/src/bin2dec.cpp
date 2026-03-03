@@ -2,7 +2,7 @@
 #include <string>
 #include <cstdint>
 
-const std::string USAGE_MESSAGE = "Usage:\n  bin2dec.exe <binary_number>\n  bin2dec.exe -h\n";
+const std::string USAGE_MESSAGE = "Usage:\n  bin2dec.exe <binary_number>\n  bin2dec.exe -h\n  bin2dec.exe (then input from stdin)\n";
 const std::string ERROR_OUTPUT = "ERROR";
 const std::string ERROR_EMPTY_INPUT = "input is empty\n";
 const std::string ERROR_LENGTH_EXCEEDED = "length > 32 bits\n";
@@ -11,6 +11,7 @@ const std::string ERROR_WRONG_ARGS = "wrong number of arguments\n";
 
 const size_t MAX_BINARY_LENGTH = 32;
 const int EXPECTED_ARGS = 2;
+const int STDIN_ARGS = 1;
 
 bool ConvertBinaryToDecimal(const std::string& binary, uint32_t& result)
 {
@@ -49,29 +50,44 @@ bool ConvertBinaryToDecimal(const std::string& binary, uint32_t& result)
 
 int main(int argc, char* argv[])
 {
-    if (argc != EXPECTED_ARGS)
-    {
-        std::cout << ERROR_WRONG_ARGS;
-        std::cout << ERROR_OUTPUT;
-        return 1;
-    }
+    std::string input;
+    uint32_t result = 0;
 
-    if (std::string(argv[1]) == "-h")
+    if (argc == EXPECTED_ARGS && std::string(argv[1]) == "-h")
     {
         std::cout << USAGE_MESSAGE;
         return 0;
     }
 
-    std::string input = argv[1];
-    uint32_t result = 0;
-
-    if (!ConvertBinaryToDecimal(input, result))
+    if (argc == EXPECTED_ARGS)
     {
-        std::cout << ERROR_OUTPUT;
-        return 1;
+        input = argv[1];
+        
+        if (!ConvertBinaryToDecimal(input, result))
+        {
+            std::cout << ERROR_OUTPUT;
+            return 1;
+        }
+        
+        std::cout << result << std::endl;
+        return 0;
     }
 
-    std::cout << result << std::endl;
+    if (argc == STDIN_ARGS)
+    {
+        std::getline(std::cin, input);
+        
+        if (!ConvertBinaryToDecimal(input, result))
+        {
+            std::cout << ERROR_OUTPUT;
+            return 0;
+        }
+        
+        std::cout << result << std::endl;
+        return 0;
+    }
 
-    return 0;
+    std::cout << ERROR_WRONG_ARGS;
+    std::cout << ERROR_OUTPUT;
+    return 1;
 }

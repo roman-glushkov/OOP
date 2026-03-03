@@ -62,10 +62,12 @@ rem Тест 9 – справка
 if ERRORLEVEL 1 goto err
 echo Test 9 passed help
 
-rem Тест 10 – без аргументов
-%PROGRAM% > "%OUTPUT_DIR%\test10_output.txt"
-if NOT ERRORLEVEL 1 goto err
-echo Test 10 passed no arguments returns ERROR
+rem Тест 10 – корректное число через stdin: 110010000 -> 400
+echo 110010000| %PROGRAM% > "%OUTPUT_DIR%\test10_output.txt"
+if ERRORLEVEL 1 goto err
+fc.exe "%OUTPUT_DIR%\test10_output.txt" "%TEST_DIR%\expected_400.txt" > nul
+if ERRORLEVEL 1 goto err
+echo Test 10 passed stdin: 110010000 to 400
 
 echo Program testing succeeded
 exit 0
