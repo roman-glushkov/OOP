@@ -1,24 +1,7 @@
 #define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+#include "../../catch2/catch.hpp"
 #include "functions.h"
 #include <sstream>
-
-TEST_CASE("ProcessNumbers multiplies by minimum")
-{
-    std::vector<double> input{2.0, 4.0, -1.5};
-    auto result = ProcessNumbers(input);
-
-    std::vector<double> expected{-3.0, -6.0, 2.25};
-    CHECK(result == expected);
-}
-
-TEST_CASE("ProcessNumbers handles empty vector")
-{
-    std::vector<double> input;
-    auto result = ProcessNumbers(input);
-
-    CHECK(result.empty());
-}
 
 TEST_CASE("ReadNumbers reads valid input")
 {
@@ -42,6 +25,23 @@ TEST_CASE("ReadNumbers detects invalid input")
     auto result = ReadNumbers(input, isValid);
 
     CHECK_FALSE(isValid);
+}
+
+TEST_CASE("ProcessNumbers multiplies by minimum")
+{
+    std::vector<double> input{2.0, 4.0, -1.5};
+    auto result = ProcessNumbers(input);
+
+    std::vector<double> expected{-3.0, -6.0, 2.25};
+    CHECK(result == expected);
+}
+
+TEST_CASE("ProcessNumbers handles empty vector")
+{
+    std::vector<double> input;
+    auto result = ProcessNumbers(input);
+
+    CHECK(result.empty());
 }
 
 TEST_CASE("PrintSortedNumbers prints sorted output")
