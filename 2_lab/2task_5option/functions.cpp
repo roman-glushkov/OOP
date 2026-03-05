@@ -20,50 +20,26 @@ std::vector<std::string> ReadLines(std::istream& in, bool& isValid)
     return lines;
 }
 
-std::string HtmlDecode(std::string const& html)
+std::string HtmlDecode(const std::string& html)
 {
-    std::string result;
-    result.reserve(html.size());
+    std::string result = html;
 
-    for (size_t i = 0; i < html.size();)
+    const std::map<std::string, std::string> entities =
     {
-        if (html[i] == '&')
+        {"&quot;", "\""},
+        {"&apos;", "'"},
+        {"&lt;", "<"},
+        {"&gt;", ">"},
+        {"&amp;", "&"}
+    };
+
+    for (const auto& entity : entities)
+    {
+        size_t pos = 0;
+
+        while ((pos = result.find(entity.first, pos)) != std::string::npos)
         {
-            if (html.compare(i, 6, "&quot;") == 0)
-            {
-                result.push_back('"');
-                i += 6;
-            }
-            else if (html.compare(i, 6, "&apos;") == 0)
-            {
-                result.push_back('\'');
-                i += 6;
-            }
-            else if (html.compare(i, 4, "&lt;") == 0)
-            {
-                result.push_back('<');
-                i += 4;
-            }
-            else if (html.compare(i, 4, "&gt;") == 0)
-            {
-                result.push_back('>');
-                i += 4;
-            }
-            else if (html.compare(i, 5, "&amp;") == 0)
-            {
-                result.push_back('&');
-                i += 5;
-            }
-            else
-            {
-                result.push_back(html[i]);
-                ++i;
-            }
-        }
-        else
-        {
-            result.push_back(html[i]);
-            ++i;
+            result.replace(pos, entity.first.length(), entity.second);
         }
     }
 

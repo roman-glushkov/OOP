@@ -49,3 +49,29 @@ TEST_CASE("HtmlDecode leaves unknown entity unchanged")
 {
     CHECK(HtmlDecode("&unknown;") == "&unknown;");
 }
+
+TEST_CASE("HtmlDecode works for multiple lines")
+{
+    std::vector<std::string> input =
+    {
+        "Cat &lt;says&gt;",
+        "M&amp;M&apos;s",
+        "&quot;Hello&quot;"
+    };
+
+    std::vector<std::string> expected =
+    {
+        "Cat <says>",
+        "M&M's",
+        "\"Hello\""
+    };
+
+    std::vector<std::string> result;
+
+    for (const auto& line : input)
+    {
+        result.push_back(HtmlDecode(line));
+    }
+
+    CHECK(result == expected);
+}

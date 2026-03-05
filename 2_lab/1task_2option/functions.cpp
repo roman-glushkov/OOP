@@ -62,14 +62,11 @@ void PrintSortedNumbers(const std::vector<double>& numbers, std::ostream& out)
 
     out << std::fixed << std::setprecision(OUTPUT_PRECISION);
 
-    for (size_t i = 0; i < sorted.size(); ++i)
-    {
-        if (i > 0)
-        {
-            out << " ";
-        }
-        out << sorted[i];
-    }
-
+    std::copy(
+        sorted.begin(),
+        sorted.end() - 1,
+        std::ostream_iterator<double>(out, " ")
+    );
+    out << sorted.back();
     out << std::endl;
 }
