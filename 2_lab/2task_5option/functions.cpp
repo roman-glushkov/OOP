@@ -22,25 +22,38 @@ std::vector<std::string> ReadLines(std::istream& in, bool& isValid)
 
 std::string HtmlDecode(const std::string& html)
 {
-    std::string result = html;
-
-    const std::map<std::string, std::string> entities =
+    static const std::map<std::string, char> entities =
     {
-        {"&quot;", "\""},
-        {"&apos;", "'"},
-        {"&lt;", "<"},
-        {"&gt;", ">"},
-        {"&amp;", "&"}
+        {"&quot;", '"'},
+        {"&apos;", '\''},
+        {"&lt;", '<'},
+        {"&gt;", '>'},
+        {"&amp;", '&'}
     };
 
-    for (const auto& entity : entities)
-    {
-        size_t pos = 0;
+    std::string result;
+    result.reserve(html.size());
 
-        while ((pos = result.find(entity.first, pos)) != std::string::npos)
+    for (size_t i = 0; i < html.size();)
+    {
+        bool replaced = false;
+
+        if (html[i] == '&')
         {
-            result.replace(pos, entity.first.length(), entity.second);
+            for (const auto& [key, value] : entities)
+            {
+                if (html.compare(i, key.size(), key) == 0)
+                {
+                    result += value;
+                    i += key.size();
+                    replaced = true;
+                    break;
+                }
+            }
         }
+
+        if (!replaced)
+            result += html[i++];
     }
 
     return result;
