@@ -1,14 +1,13 @@
 #include "Car.h"
-#include <map>
 
 const std::map<int, GearRange> Car::GEAR_SPEED_RANGES =
 {
     {-1, {0, 20}},
-    {1,  {0, 30}},
-    {2,  {20, 50}},
-    {3,  {30, 60}},
-    {4,  {40, 90}},
-    {5,  {50, 150}}
+    {1, {0, 30}},
+    {2, {20, 50}},
+    {3, {30, 60}},
+    {4, {40, 90}},
+    {5, {50, 150}}
 };
 
 bool Car::IsTurnedOn() const
@@ -58,6 +57,9 @@ bool Car::SetGear(int gear)
     if (gear == -1 && m_speed != 0)
         return false;
 
+    if (gear > 0 && m_direction == -1 && m_speed != 0)
+        return false;
+
     if (gear != 0 && !IsSpeedInGearRange(gear, m_speed))
         return false;
 
@@ -80,6 +82,14 @@ bool Car::SetSpeed(int speed)
         return false;
 
     m_speed = speed;
+
+    if (m_speed == 0)
+        m_direction = 0;
+    else if (m_gear == -1)
+        m_direction = -1;
+    else if (m_gear > 0)
+        m_direction = 1;
+
     return true;
 }
 
@@ -91,4 +101,9 @@ int Car::GetGear() const
 int Car::GetSpeed() const
 {
     return m_speed;
+}
+
+int Car::GetDirection() const
+{
+    return m_direction;
 }

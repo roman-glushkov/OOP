@@ -1,4 +1,14 @@
+Info
 EngineOn
 SetGear 1
-SetSpeed 19
+SetSpeed 30
 SetGear 2
+SetSpeed 40
+SetGear 3
+SetSpeed 55
+SetGear 0
+SetSpeed 20
+SetSpeed 10
+SetGear 1
+SetSpeed 20
+Info

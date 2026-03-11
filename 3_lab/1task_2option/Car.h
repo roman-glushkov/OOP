@@ -19,11 +19,13 @@ public:
 
     int GetGear() const;
     int GetSpeed() const;
+    int GetDirection() const;
 
 private:
     bool m_isEngineOn = false;
     int m_gear = 0;
     int m_speed = 0;
+    int m_direction = 0;
 
     bool IsSpeedInGearRange(int gear, int speed) const;
 
