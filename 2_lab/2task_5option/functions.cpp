@@ -1,4 +1,5 @@
 #include "functions.h"
+#include <map>
 
 std::vector<std::string> ReadLines(std::istream& in, bool& isValid)
 {

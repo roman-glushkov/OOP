@@ -1,15 +1,5 @@
 #include "Car.h"
 
-const std::map<int, GearRange> Car::GEAR_SPEED_RANGES =
-{
-    {-1, {0, 20}},
-    {1, {0, 30}},
-    {2, {20, 50}},
-    {3, {30, 60}},
-    {4, {40, 90}},
-    {5, {50, 150}}
-};
-
 bool Car::IsTurnedOn() const
 {
     return m_isEngineOn;
@@ -18,7 +8,9 @@ bool Car::IsTurnedOn() const
 bool Car::TurnOnEngine()
 {
     if (m_isEngineOn)
+    {
         return true;
+    }
 
     m_isEngineOn = true;
     return true;
@@ -27,10 +19,14 @@ bool Car::TurnOnEngine()
 bool Car::TurnOffEngine()
 {
     if (!m_isEngineOn)
+    {
         return true;
+    }
 
-    if (m_speed != 0 || m_gear != 0)
+    if (m_speed != MIN_SPEED || m_gear != NEUTRAL_GEAR)
+    {
         return false;
+    }
 
     m_isEngineOn = false;
     return true;
@@ -39,58 +35,94 @@ bool Car::TurnOffEngine()
 bool Car::IsSpeedInGearRange(int gear, int speed) const
 {
     const auto it = GEAR_SPEED_RANGES.find(gear);
+
     if (it == GEAR_SPEED_RANGES.end())
+    {
         return false;
+    }
 
     const GearRange& range = it->second;
+
     return speed >= range.min && speed <= range.max;
 }
 
 bool Car::SetGear(int gear)
 {
-    if (gear < -1 || gear > 5)
+    if (gear < MIN_GEAR || gear > MAX_GEAR)
+    {
         return false;
+    }
 
     if (!m_isEngineOn)
+    {
         return false;
+    }
 
-    if (gear == -1 && m_speed != 0)
+    if (gear == REVERSE_GEAR && m_speed != MIN_SPEED)
+    {
         return false;
+    }
 
-    if (gear > 0 && m_direction == -1 && m_speed != 0)
+    if (gear > NEUTRAL_GEAR && m_direction == DIRECTION_BACKWARD && m_speed != MIN_SPEED)
+    {
         return false;
+    }
 
-    if (gear != 0 && !IsSpeedInGearRange(gear, m_speed))
+    if (gear != NEUTRAL_GEAR && !IsSpeedInGearRange(gear, m_speed))
+    {
         return false;
+    }
 
     m_gear = gear;
+
+    UpdateDirection();
+
     return true;
 }
 
 bool Car::SetSpeed(int speed)
 {
-    if (speed < 0)
+    if (speed < MIN_SPEED)
+    {
         return false;
+    }
 
     if (!m_isEngineOn)
+    {
         return false;
+    }
 
-    if (m_gear == 0 && speed > m_speed)
+    if (m_gear == NEUTRAL_GEAR && speed > m_speed)
+    {
         return false;
+    }
 
-    if (m_gear != 0 && !IsSpeedInGearRange(m_gear, speed))
+    if (m_gear != NEUTRAL_GEAR && !IsSpeedInGearRange(m_gear, speed))
+    {
         return false;
+    }
 
     m_speed = speed;
 
-    if (m_speed == 0)
-        m_direction = 0;
-    else if (m_gear == -1)
-        m_direction = -1;
-    else if (m_gear > 0)
-        m_direction = 1;
+    UpdateDirection();
 
     return true;
+}
+
+void Car::UpdateDirection()
+{
+    if (m_speed == MIN_SPEED)
+    {
+        m_direction = DIRECTION_STOPPED;
+    }
+    else if (m_gear == REVERSE_GEAR)
+    {
+        m_direction = DIRECTION_BACKWARD;
+    }
+    else if (m_gear > NEUTRAL_GEAR)
+    {
+        m_direction = DIRECTION_FORWARD;
+    }
 }
 
 int Car::GetGear() const
