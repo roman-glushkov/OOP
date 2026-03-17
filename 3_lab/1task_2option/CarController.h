@@ -12,7 +12,6 @@ class CarController
 public:
     CarController(std::istream& input, std::ostream& output);
     void ProcessCommands();
-
     void Info(std::istringstream& args);
     void EngineOn(std::istringstream& args);
     void EngineOff(std::istringstream& args);
@@ -28,7 +27,6 @@ private:
     Car m_car;
 
     std::map<std::string, Command> m_commands;
-
     std::string GetDirection(int direction) const;
 
 private:
