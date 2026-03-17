@@ -24,11 +24,11 @@ public:
 };
 
 enum class QuadrilateralType {
-    Rectangle,
-    Square,
-    Rhombus,
-    Parallelogram,
-    Trapezoid,
+    Rectangle, // прямоугольник
+    Square, // квадрат
+    Rhombus, // ромб
+    Parallelogram, // паралелограмм
+    Trapezoid, // трапеция
 };
 
 class Quadrilateral : public Shape
