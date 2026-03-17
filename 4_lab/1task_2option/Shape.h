@@ -14,13 +14,13 @@ class Shape
 public:
     Shape(std::string outline, std::string fill) : outlineColor(outline), fillColor(fill) {}
     
-    virtual ~Shape() = default;
-    virtual double Area() const = 0;
-    virtual double Perimeter() const = 0;
-    virtual std::string ToString() const = 0;
+    virtual ~Shape() = default; // удаление
+    virtual double Area() const = 0; // площадь
+    virtual double Perimeter() const = 0; // периметр
+    virtual std::string ToString() const = 0; // сама строка
 
-    std::string outlineColor;
-    std::string fillColor;
+    std::string outlineColor; // цвет границы
+    std::string fillColor; // цвет заливки
 };
 
 enum class QuadrilateralType {
@@ -49,8 +49,7 @@ private:
 class Circle : public Shape
 {
 public:
-    Circle(Point c, double r, std::string outline, std::string fill) 
-        : Shape(outline, fill), center(c), radius(r) {}
+    Circle(Point c, double r, std::string outline, std::string fill) : Shape(outline, fill), center(c), radius(r) {}
 
     double Area() const override;
     double Perimeter() const override;
@@ -64,8 +63,7 @@ private:
 class Triangle : public Shape
 {
 public:
-    Triangle(Point a, Point b, Point c, std::string outline, std::string fill) 
-        : Shape(outline, fill), p1(a), p2(b), p3(c) {}
+    Triangle(Point a, Point b, Point c, std::string outline, std::string fill) : Shape(outline, fill), p1(a), p2(b), p3(c) {}
 
     double Area() const override;
     double Perimeter() const override;
@@ -78,8 +76,7 @@ private:
 class Line : public Shape
 {
 public:
-    Line(Point a, Point b, std::string outline) 
-        : Shape(outline, "none"), p1(a), p2(b) {}
+    Line(Point a, Point b, std::string outline) : Shape(outline, "none"), p1(a), p2(b) {}
 
     double Area() const override { return 0; }
     double Perimeter() const override;
