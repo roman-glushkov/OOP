@@ -43,10 +43,10 @@ class Shape
 public:
     Shape(std::string outline, std::string fill) : outlineColor(outline), fillColor(fill) {}
     
-    virtual ~Shape() = default; // удаление
-    virtual double Area() const = 0; // площадь
-    virtual double Perimeter() const = 0; // периметр
-    virtual std::string ToString() const = 0; // сама строка
+    virtual ~Shape() = default;
+    virtual double Area() const = 0;
+    virtual double Perimeter() const = 0;
+    virtual std::string ToString() const = 0;
 
     std::string outlineColor;
     std::string fillColor; 

@@ -7,7 +7,7 @@
 #include <string>        
 
 bool isValidColor(const std::string& color) {
-    if (color.length() != 6) return false;
+    if (color.length() != COLOR_STRING_LENGTH) return false;
     for (char c : color) {
         if (!std::isxdigit(static_cast<unsigned char>(c))) return false;
     }
@@ -169,12 +169,12 @@ void printShapeInfo(const std::shared_ptr<Shape>& shape, const std::string& titl
     if (!shape) return;
 
     std::cout << OUTPUT_TITLE_PREFIX << title << OUTPUT_TITLE_SUFFIX;
-    std::cout << shape->ToString() << "\n";
-    std::cout << OUTPUT_AREA << std::fixed << std::setprecision(2) << shape->Area() << "\n";
-    std::cout << OUTPUT_PERIMETER << std::fixed << std::setprecision(2) << shape->Perimeter() << "\n";
-    std::cout << OUTPUT_OUTLINE_COLOR << shape->outlineColor << "\n";
+    std::cout << shape->ToString() << NEWLINE;
+    std::cout << OUTPUT_AREA << std::fixed << std::setprecision(OUTPUT_PRECISION) << shape->Area() << NEWLINE;
+    std::cout << OUTPUT_PERIMETER << std::fixed << std::setprecision(OUTPUT_PRECISION) << shape->Perimeter() << NEWLINE;
+    std::cout << OUTPUT_OUTLINE_COLOR << shape->outlineColor << NEWLINE;
 
     if (shape->fillColor != OUTPUT_FILL_COLOR_NONE) {
-        std::cout << OUTPUT_FILL_COLOR << shape->fillColor << "\n";
+        std::cout << OUTPUT_FILL_COLOR << shape->fillColor << NEWLINE;
     }
 }

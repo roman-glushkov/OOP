@@ -13,10 +13,7 @@ static double Distance(const Point& a, const Point& b) {
 }
 
 double Quadrilateral::Area() const {
-    double area =
-        p1.x * p2.y + p2.x * p3.y + p3.x * p4.y + p4.x * p1.y
-      - p2.x * p1.y - p3.x * p2.y - p4.x * p3.y - p1.x * p4.y;
-
+    double area = p1.x * p2.y + p2.x * p3.y + p3.x * p4.y + p4.x * p1.y - p2.x * p1.y - p3.x * p2.y - p4.x * p3.y - p1.x * p4.y;
     return std::abs(area) / 2.0;
 }
 
@@ -25,19 +22,12 @@ double Circle::Area() const {
 }
 
 double Triangle::Area() const {
-    double area =
-        p1.x * (p2.y - p3.y) +
-        p2.x * (p3.y - p1.y) +
-        p3.x * (p1.y - p2.y);
-
+    double area = p1.x * (p2.y - p3.y) + p2.x * (p3.y - p1.y) + p3.x * (p1.y - p2.y);
     return std::abs(area) / 2.0;
 }
 
 double Quadrilateral::Perimeter() const {
-    return Distance(p1, p2) +
-           Distance(p2, p3) +
-           Distance(p3, p4) +
-           Distance(p4, p1);
+    return Distance(p1, p2) + Distance(p2, p3) + Distance(p3, p4) + Distance(p4, p1);
 }
 
 double Circle::Perimeter() const {
@@ -68,6 +58,7 @@ std::string Quadrilateral::ToString() const {
         << p3.x << FORMAT_COMMA_SPACE << p3.y << FORMAT_CLOSE_PAREN 
         << p4.x << FORMAT_COMMA_SPACE << p4.y << FORMAT_CLOSE_BRACKET;
     return oss.str();
+    // Вывод: Rectangle [(x1, y1), (x2, y2), (x3, y3), (x4, y4)]
 }
 
 std::string Circle::ToString() const {
@@ -76,6 +67,7 @@ std::string Circle::ToString() const {
         << center.x << FORMAT_COMMA_SPACE << center.y 
         << FORMAT_CIRCLE_RADIUS << radius << "]";
     return oss.str();
+    // Вывод: Circle [center: (x, y), radius: r]
 }
 
 std::string Triangle::ToString() const {
@@ -85,6 +77,7 @@ std::string Triangle::ToString() const {
         << p2.x << FORMAT_COMMA_SPACE << p2.y << FORMAT_TRIANGLE_SEP
         << p3.x << FORMAT_COMMA_SPACE << p3.y << FORMAT_CLOSE_BRACKET;
     return oss.str();
+    // Вывод: Triangle [(x1, y1), (x2, y2), (x3, y3)]
 }
 
 std::string Line::ToString() const {
@@ -93,4 +86,5 @@ std::string Line::ToString() const {
         << p1.x << FORMAT_COMMA_SPACE << p1.y << FORMAT_LINE_ARROW
         << p2.x << FORMAT_COMMA_SPACE << p2.y << FORMAT_CLOSE_BRACKET;
     return oss.str();
+    // Вывод: Line [(x1, y1) -> (x2, y2)]
 }

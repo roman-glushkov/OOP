@@ -1,0 +1,8 @@
+Program to replace substrings in text.
+Usage:
+  replace.exe <input_file> <output_file> <search_string> <replace_string>
+  or run without arguments to input via stdin:
+    first line: search string
+    second line: replace string
+    then text to replace (until end of input)
+  replace.exe -h - show this help

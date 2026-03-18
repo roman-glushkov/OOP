@@ -40,6 +40,9 @@ const std::string NEWLINE = "\n";
 const std::string TITLE_MAX_AREA = "SHAPE WITH MAXIMUM AREA";
 const std::string TITLE_MIN_PERIMETER = "SHAPE WITH MINIMUM PERIMETER";
 
+const int OUTPUT_PRECISION = 2;                                            
+const size_t COLOR_STRING_LENGTH = 6; 
+
 bool isValidColor(const std::string& color);
 std::shared_ptr<Shape> parseShape(const std::string& line);
 std::shared_ptr<Shape> findMaxArea(const std::vector<std::shared_ptr<Shape>>& shapes);
