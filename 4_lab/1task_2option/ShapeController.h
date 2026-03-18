@@ -1,84 +1,47 @@
 #pragma once
 
 #include "Shape.h"
-#include <iostream>
+#include <string>
 #include <vector>
 #include <memory>
-#include <string>
-#include <functional>
-#include <istream>
-#include <ostream>
-#include <sstream>
 
-class ShapeController
-{
-public:
-    ShapeController(std::istream& input, std::ostream& output);
-    void ProcessCommands();
+const std::string ERROR_PREFIX = "ERROR: ";
+const std::string ERROR_INVALID_FORMAT = "invalid input format\n";
+const std::string ERROR_UNKNOWN_TYPE = "unknown shape type\n";
+const std::string ERROR_INVALID_COLOR = "invalid color\n";
+const std::string ERROR_EXTRA_DATA = "extra data in input\n";
+const std::string ERROR_INVALID_RADIUS = "radius must be positive\n";
+const std::string ERROR_EMPTY_INPUT = "empty input\n";
 
-private:
-    using Command = std::function<void(std::istringstream&)>;
+const std::string SHAPE_RECTANGLE = "rectangle";
+const std::string SHAPE_SQUARE = "square";
+const std::string SHAPE_RHOMBUS = "rhombus";
+const std::string SHAPE_PARALLELOGRAM = "parallelogram";
+const std::string SHAPE_TRAPEZOID = "trapezoid";
+const std::string SHAPE_CIRCLE = "circle";
+const std::string SHAPE_TRIANGLE = "triangle";
+const std::string SHAPE_LINE = "line";
 
-    std::istream& m_input;
-    std::ostream& m_output;
+const std::string PROMPT_ENTER_SHAPES = "Enter shapes (Ctrl+Z or Ctrl+D to end):\n";
+const std::string MSG_ADDED_PREFIX = "Added: ";
+const std::string MSG_NO_SHAPES = "\nNo shapes entered.\n";
+const std::string MSG_TOTAL_SHAPES = "\n" + std::string(50, '=') + "\nTotal shapes: ";
+const std::string MSG_SEPARATOR = "\n" + std::string(50, '=') + "\n";
 
-    std::vector<std::shared_ptr<Shape>> m_shapes;
+const std::string OUTPUT_TITLE_PREFIX = "\n=== ";
+const std::string OUTPUT_TITLE_SUFFIX = " ===\n";
+const std::string OUTPUT_AREA = "Area: ";
+const std::string OUTPUT_PERIMETER = "Perimeter: ";
+const std::string OUTPUT_OUTLINE_COLOR = "Outline color: #";
+const std::string OUTPUT_FILL_COLOR = "Fill color: #";
+const std::string OUTPUT_FILL_COLOR_NONE = "none";
+const std::string NEWLINE = "\n";
 
-    std::map<std::string, Command> m_commands;
+const std::string TITLE_MAX_AREA = "SHAPE WITH MAXIMUM AREA";
+const std::string TITLE_MIN_PERIMETER = "SHAPE WITH MINIMUM PERIMETER";
 
-    bool isValidColor(const std::string& color) const;
-    std::shared_ptr<Shape> parseShape(const std::string& line);
-    std::shared_ptr<Shape> findMaxArea() const;
-    std::shared_ptr<Shape> findMinPerimeter() const;
-    void printShapeInfo(const std::shared_ptr<Shape>& shape, const std::string& title) const;
-    void printResults() const;
-
-    // Command handlers
-    void HandleShapeInput(std::istringstream& args);
-    void HandlePrintResults(std::istringstream& args);
-
-    // Static constants
-public:
-    // Error messages
-    static constexpr const char* ERROR_PREFIX = "ERROR: ";
-    static constexpr const char* ERROR_INVALID_FORMAT = "invalid input format\n";
-    static constexpr const char* ERROR_UNKNOWN_TYPE = "unknown shape type\n";
-    static constexpr const char* ERROR_INVALID_COLOR = "invalid color\n";
-    static constexpr const char* ERROR_EXTRA_DATA = "extra data in input\n";
-    static constexpr const char* ERROR_INVALID_RADIUS = "radius must be positive\n";
-    static constexpr const char* ERROR_EMPTY_INPUT = "empty input\n";
-
-    // Shape types
-    static constexpr const char* SHAPE_RECTANGLE = "rectangle";
-    static constexpr const char* SHAPE_SQUARE = "square";
-    static constexpr const char* SHAPE_RHOMBUS = "rhombus";
-    static constexpr const char* SHAPE_PARALLELOGRAM = "parallelogram";
-    static constexpr const char* SHAPE_TRAPEZOID = "trapezoid";
-    static constexpr const char* SHAPE_CIRCLE = "circle";
-    static constexpr const char* SHAPE_TRIANGLE = "triangle";
-    static constexpr const char* SHAPE_LINE = "line";
-
-    // UI messages
-    static constexpr const char* PROMPT_ENTER_SHAPES = "Enter shapes (Enter 'done' to finish):\n";
-    static constexpr const char* PROMPT_CONTINUE = "Enter next shape or 'done' to finish:\n";
-    static constexpr const char* MSG_ADDED_PREFIX = "Added: ";
-    static constexpr const char* MSG_NO_SHAPES = "\nNo shapes entered.\n";
-    static constexpr const char* MSG_TOTAL_SHAPES_PREFIX = "\nTotal shapes: ";
-    static constexpr const char* MSG_SEPARATOR = "==================================================";
-
-    // Output format strings
-    static constexpr const char* OUTPUT_TITLE_PREFIX = "\n=== ";
-    static constexpr const char* OUTPUT_TITLE_SUFFIX = " ===\n";
-    static constexpr const char* OUTPUT_AREA = "Area: ";
-    static constexpr const char* OUTPUT_PERIMETER = "Perimeter: ";
-    static constexpr const char* OUTPUT_OUTLINE_COLOR = "Outline color: #";
-    static constexpr const char* OUTPUT_FILL_COLOR = "Fill color: #";
-    static constexpr const char* OUTPUT_FILL_COLOR_NONE = "none";
-
-    // Special titles
-    static constexpr const char* TITLE_MAX_AREA = "SHAPE WITH MAXIMUM AREA";
-    static constexpr const char* TITLE_MIN_PERIMETER = "SHAPE WITH MINIMUM PERIMETER";
-
-    // Commands
-    static constexpr const char* CMD_DONE = "done";
-};
+bool isValidColor(const std::string& color);
+std::shared_ptr<Shape> parseShape(const std::string& line);
+std::shared_ptr<Shape> findMaxArea(const std::vector<std::shared_ptr<Shape>>& shapes);
+std::shared_ptr<Shape> findMinPerimeter(const std::vector<std::shared_ptr<Shape>>& shapes);
+void printShapeInfo(const std::shared_ptr<Shape>& shape, const std::string& title);
