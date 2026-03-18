@@ -1,5 +1,5 @@
-g++ -std=c++20 main.cpp Car.cpp -o car_program
-Get-Content .\input.txt | .\car_program.exe
+g++ -std=c++17 main.cpp Shapes.cpp -o shapes_program
+Get-Content .\input.txt | .\shapes_program.exe
 
 g++ -o tests tests.cpp Car.cpp CarController.cpp
 .\tests.exe

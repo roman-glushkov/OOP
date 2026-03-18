@@ -1,9 +1,10 @@
-#include "shapes.h"
+#include "Shape.h"
 #include <sstream>
 #include <iomanip>
 #include <cmath>
 #include <algorithm>
 #include <numeric>
+#include <array>
 
 static double Distance(const Point& a, const Point& b) {
     double dx = a.x - b.x;
@@ -12,84 +13,35 @@ static double Distance(const Point& a, const Point& b) {
 }
 
 double Quadrilateral::Area() const {
-    switch(type) {
-        case QuadrilateralType::Rectangle: case QuadrilateralType::Square:
-        {
-            return std::abs((p2.x - p1.x) * (p4.y - p1.y));
-        }
-            
-        case QuadrilateralType::Rhombus:
-        {
-            return (Distance(p1, p3) * Distance(p2, p4)) / 2.0;
-        }
-            
-        case QuadrilateralType::Parallelogram:
-        {
-            double base = Distance(p1, p2);
-            double height = std::abs((p2.x - p1.x) * (p1.y - p4.y) - (p1.x - p4.x) * (p2.y - p1.y)) / base;
-            return base * height;
-        }
-            
-        case QuadrilateralType::Trapezoid:
-        {
-            double a = Distance(p1, p2);
-            double b = Distance(p3, p4);
-            double height = std::abs(p4.y - p1.y);
-            return (a + b) * height / 2.0;
-        }
-    }
+    double area =
+        p1.x * p2.y + p2.x * p3.y + p3.x * p4.y + p4.x * p1.y
+      - p2.x * p1.y - p3.x * p2.y - p4.x * p3.y - p1.x * p4.y;
+
+    return std::abs(area) / 2.0;
 }
 
 double Circle::Area() const {
-    return M_PI * radius * radius;
+    return PI * radius * radius;
 }
 
 double Triangle::Area() const {
-    std::array<double, 3> sides = {
-        Distance(p1, p2),
-        Distance(p2, p3),
-        Distance(p3, p1)
-    };
-    double s = std::accumulate(sides.begin(), sides.end(), 0.0) / 2.0;
-    
-    return std::sqrt(s * std::accumulate(sides.begin(), sides.end(), 1.0,
-        [s](double product, double side) {
-            return product * (s - side);
-        }));
-}
+    double area =
+        p1.x * (p2.y - p3.y) +
+        p2.x * (p3.y - p1.y) +
+        p3.x * (p1.y - p2.y);
 
-double Line::Area() const {
-    return 0;
+    return std::abs(area) / 2.0;
 }
 
 double Quadrilateral::Perimeter() const {
-    std::array<double, 4> sides = {
-        Distance(p1, p2),
-        Distance(p2, p3),
-        Distance(p3, p4),
-        Distance(p4, p1)
-    };
-    
-    switch(type) {
-        case QuadrilateralType::Rectangle: case QuadrilateralType::Parallelogram:
-        {
-            return 2 * (sides[0] + sides[1]);
-        }
-            
-        case QuadrilateralType::Square: case QuadrilateralType::Rhombus:
-        {
-            return 4 * sides[0];
-        }
-            
-        case QuadrilateralType::Trapezoid:
-        {
-            return sides[0] + sides[1] + sides[2] + sides[3];
-        }
-    }
+    return Distance(p1, p2) +
+           Distance(p2, p3) +
+           Distance(p3, p4) +
+           Distance(p4, p1);
 }
 
 double Circle::Perimeter() const {
-    return 2 * M_PI * radius;
+    return 2 * PI * radius;
 }
 
 double Triangle::Perimeter() const {
@@ -102,33 +54,43 @@ double Line::Perimeter() const {
 
 std::string Quadrilateral::ToString() const {
     static const char* typeNames[] = {
-        "Rectangle", "Square", "Rhombus", "Parallelogram", "Trapezoid"
+        SHAPE_NAME_RECTANGLE.c_str(), 
+        SHAPE_NAME_SQUARE.c_str(), 
+        SHAPE_NAME_RHOMBUS.c_str(), 
+        SHAPE_NAME_PARALLELOGRAM.c_str(), 
+        SHAPE_NAME_TRAPEZOID.c_str()
     };
     
     std::ostringstream oss;
-    oss << typeNames[static_cast<int>(type)] << " [(" 
-        << p1.x << ", " << p1.y << "), (" << p2.x << ", " << p2.y << "), ("
-        << p3.x << ", " << p3.y << "), (" << p4.x << ", " << p4.y << ")]";
+    oss << typeNames[static_cast<int>(type)] << FORMAT_QUADRILATERAL 
+        << p1.x << FORMAT_COMMA_SPACE << p1.y << FORMAT_CLOSE_PAREN 
+        << p2.x << FORMAT_COMMA_SPACE << p2.y << FORMAT_CLOSE_PAREN
+        << p3.x << FORMAT_COMMA_SPACE << p3.y << FORMAT_CLOSE_PAREN 
+        << p4.x << FORMAT_COMMA_SPACE << p4.y << FORMAT_CLOSE_BRACKET;
     return oss.str();
 }
 
 std::string Circle::ToString() const {
     std::ostringstream oss;
-    oss << "Circle [center: (" << center.x << ", " << center.y 
-        << "), radius: " << radius << "]";
+    oss << SHAPE_NAME_CIRCLE << FORMAT_CIRCLE_CENTER 
+        << center.x << FORMAT_COMMA_SPACE << center.y 
+        << FORMAT_CIRCLE_RADIUS << radius << "]";
     return oss.str();
 }
 
 std::string Triangle::ToString() const {
     std::ostringstream oss;
-    oss << "Triangle [(" << p1.x << ", " << p1.y << "), ("
-        << p2.x << ", " << p2.y << "), (" << p3.x << ", " << p3.y << ")]";
+    oss << SHAPE_NAME_TRIANGLE << FORMAT_TRIANGLE_OPEN 
+        << p1.x << FORMAT_COMMA_SPACE << p1.y << FORMAT_TRIANGLE_SEP
+        << p2.x << FORMAT_COMMA_SPACE << p2.y << FORMAT_TRIANGLE_SEP
+        << p3.x << FORMAT_COMMA_SPACE << p3.y << FORMAT_CLOSE_BRACKET;
     return oss.str();
 }
 
 std::string Line::ToString() const {
     std::ostringstream oss;
-    oss << "Line [(" << p1.x << ", " << p1.y << ") -> ("
-        << p2.x << ", " << p2.y << ")]";
+    oss << SHAPE_NAME_LINE << FORMAT_LINE_OPEN 
+        << p1.x << FORMAT_COMMA_SPACE << p1.y << FORMAT_LINE_ARROW
+        << p2.x << FORMAT_COMMA_SPACE << p2.y << FORMAT_CLOSE_BRACKET;
     return oss.str();
 }

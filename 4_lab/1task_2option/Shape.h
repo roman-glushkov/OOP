@@ -2,11 +2,45 @@
 
 #include <string>
 #include <cmath>
+#include <map>
+
+// Default values
+const double DEFAULT = 0.0;
+
+// String constants
+const std::string FILL_COLOR_NONE = "none";
+
+// Shape names
+const std::string SHAPE_NAME_RECTANGLE = "Rectangle";
+const std::string SHAPE_NAME_SQUARE = "Square";
+const std::string SHAPE_NAME_RHOMBUS = "Rhombus";
+const std::string SHAPE_NAME_PARALLELOGRAM = "Parallelogram";
+const std::string SHAPE_NAME_TRAPEZOID = "Trapezoid";
+const std::string SHAPE_NAME_CIRCLE = "Circle";
+const std::string SHAPE_NAME_TRIANGLE = "Triangle";
+const std::string SHAPE_NAME_LINE = "Line";
+
+// Format strings for ToString methods
+const std::string FORMAT_QUADRILATERAL = " [(";
+const std::string FORMAT_COMMA_SPACE = ", ";
+const std::string FORMAT_CLOSE_PAREN = "), (";
+const std::string FORMAT_CLOSE_BRACKET = ")]";
+const std::string FORMAT_CIRCLE_CENTER = " [center: (";
+const std::string FORMAT_CIRCLE_RADIUS = "), radius: ";
+const std::string FORMAT_TRIANGLE_OPEN = " [(";
+const std::string FORMAT_TRIANGLE_SEP = "), (";
+const std::string FORMAT_LINE_ARROW = ") -> (";
+const std::string FORMAT_LINE_OPEN = " [(";
+
+// Math constants
+const double PI = 3.14159265358979323846;
 
 struct Point
 {
     double x;
     double y;
+    
+    Point(double x = DEFAULT, double y = DEFAULT) : x(x), y(y) {}
 };
 
 class Shape
@@ -19,16 +53,16 @@ public:
     virtual double Perimeter() const = 0; // периметр
     virtual std::string ToString() const = 0; // сама строка
 
-    std::string outlineColor; // цвет границы
-    std::string fillColor; // цвет заливки
+    std::string outlineColor;
+    std::string fillColor; 
 };
 
 enum class QuadrilateralType {
-    Rectangle, // прямоугольник
-    Square, // квадрат
-    Rhombus, // ромб
-    Parallelogram, // паралелограмм
-    Trapezoid, // трапеция
+    Rectangle,
+    Square,
+    Rhombus,
+    Parallelogram,
+    Trapezoid,
 };
 
 class Quadrilateral : public Shape
@@ -76,9 +110,9 @@ private:
 class Line : public Shape
 {
 public:
-    Line(Point a, Point b, std::string outline) : Shape(outline, "none"), p1(a), p2(b) {}
+    Line(Point a, Point b, std::string outline) : Shape(outline, FILL_COLOR_NONE), p1(a), p2(b) {}
 
-    double Area() const override { return 0; }
+    double Area() const override { return DEFAULT; }
     double Perimeter() const override;
     std::string ToString() const override;
 
