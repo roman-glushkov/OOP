@@ -9,7 +9,7 @@
 bool isValidColor(const std::string& color) {
     if (color.length() != COLOR_STRING_LENGTH) return false;
     for (char c : color) {
-        if (!std::isxdigit(static_cast<unsigned char>(c))) return false;
+        if (!std::isxdigit(c)) return false;
     }
     return true;
 }
@@ -20,7 +20,7 @@ std::shared_ptr<Shape> parseShape(const std::string& line) {
 
     if (!(iss >> type)) {
         std::cout << ERROR_PREFIX << ERROR_EMPTY_INPUT;
-        return nullptr;
+        return 0;
     }
 
     std::transform(type.begin(), type.end(), type.begin(), ::tolower);
@@ -33,18 +33,18 @@ std::shared_ptr<Shape> parseShape(const std::string& line) {
 
         if (!(iss >> x1 >> y1 >> x2 >> y2 >> x3 >> y3 >> x4 >> y4 >> outline >> fill)) {
             std::cout << ERROR_PREFIX << ERROR_INVALID_FORMAT;
-            return nullptr;
+            return 0;
         }
 
         if (!isValidColor(outline) || !isValidColor(fill)) {
             std::cout << ERROR_PREFIX << ERROR_INVALID_COLOR;
-            return nullptr;
+            return 0;
         }
 
         std::string extra;
         if (iss >> extra) {
             std::cout << ERROR_PREFIX << ERROR_EXTRA_DATA;
-            return nullptr;
+            return 0;
         }
 
         QuadrilateralType qType;
@@ -54,10 +54,7 @@ std::shared_ptr<Shape> parseShape(const std::string& line) {
         else if (type == SHAPE_PARALLELOGRAM) qType = QuadrilateralType::Parallelogram;
         else qType = QuadrilateralType::Trapezoid;
 
-        return std::make_shared<Quadrilateral>(
-            Point(x1, y1), Point(x2, y2), Point(x3, y3), Point(x4, y4),
-            qType, outline, fill
-        );
+        return std::make_shared<Quadrilateral>(Point(x1, y1), Point(x2, y2), Point(x3, y3), Point(x4, y4), qType, outline, fill);
     }
     else if (type == SHAPE_CIRCLE) {
         double x, y, radius;
@@ -65,23 +62,23 @@ std::shared_ptr<Shape> parseShape(const std::string& line) {
 
         if (!(iss >> x >> y >> radius >> outline >> fill)) {
             std::cout << ERROR_PREFIX << ERROR_INVALID_FORMAT;
-            return nullptr;
+            return 0;
         }
 
         if (radius <= 0) {
             std::cout << ERROR_PREFIX << ERROR_INVALID_RADIUS;
-            return nullptr;
+            return 0;
         }
 
         if (!isValidColor(outline) || !isValidColor(fill)) {
             std::cout << ERROR_PREFIX << ERROR_INVALID_COLOR;
-            return nullptr;
+            return 0;
         }
 
         std::string extra;
         if (iss >> extra) {
             std::cout << ERROR_PREFIX << ERROR_EXTRA_DATA;
-            return nullptr;
+            return 0;
         }
 
         return std::make_shared<Circle>(Point(x, y), radius, outline, fill);
@@ -92,24 +89,21 @@ std::shared_ptr<Shape> parseShape(const std::string& line) {
 
         if (!(iss >> x1 >> y1 >> x2 >> y2 >> x3 >> y3 >> outline >> fill)) {
             std::cout << ERROR_PREFIX << ERROR_INVALID_FORMAT;
-            return nullptr;
+            return 0;
         }
 
         if (!isValidColor(outline) || !isValidColor(fill)) {
             std::cout << ERROR_PREFIX << ERROR_INVALID_COLOR;
-            return nullptr;
+            return 0;
         }
 
         std::string extra;
         if (iss >> extra) {
             std::cout << ERROR_PREFIX << ERROR_EXTRA_DATA;
-            return nullptr;
+            return 0;
         }
 
-        return std::make_shared<Triangle>(
-            Point(x1, y1), Point(x2, y2), Point(x3, y3),
-            outline, fill
-        );
+        return std::make_shared<Triangle>(Point(x1, y1), Point(x2, y2), Point(x3, y3), outline, fill);
     }
     else if (type == SHAPE_LINE) {
         double x1, y1, x2, y2;
@@ -117,32 +111,29 @@ std::shared_ptr<Shape> parseShape(const std::string& line) {
 
         if (!(iss >> x1 >> y1 >> x2 >> y2 >> outline)) {
             std::cout << ERROR_PREFIX << ERROR_INVALID_FORMAT;
-            return nullptr;
+            return 0;
         }
 
         if (!isValidColor(outline)) {
             std::cout << ERROR_PREFIX << ERROR_INVALID_COLOR;
-            return nullptr;
+            return 0;
         }
 
         std::string extra;
         if (iss >> extra) {
             std::cout << ERROR_PREFIX << ERROR_EXTRA_DATA;
-            return nullptr;
+            return 0;
         }
 
-        return std::make_shared<Line>(
-            Point(x1, y1), Point(x2, y2),
-            outline
-        );
+        return std::make_shared<Line>(Point(x1, y1), Point(x2, y2),outline);
     }
 
     std::cout << ERROR_PREFIX << ERROR_UNKNOWN_TYPE;
-    return nullptr;
+    return 0;
 }
 
 std::shared_ptr<Shape> findMaxArea(const std::vector<std::shared_ptr<Shape>>& shapes) {
-    if (shapes.empty()) return nullptr;
+    if (shapes.empty()) return 0;
 
     auto maxShape = shapes[0];
     for (const auto& shape : shapes) {
@@ -154,7 +145,7 @@ std::shared_ptr<Shape> findMaxArea(const std::vector<std::shared_ptr<Shape>>& sh
 }
 
 std::shared_ptr<Shape> findMinPerimeter(const std::vector<std::shared_ptr<Shape>>& shapes) {
-    if (shapes.empty()) return nullptr;
+    if (shapes.empty()) return 0;
 
     auto minShape = shapes[0];
     for (const auto& shape : shapes) {
@@ -178,3 +169,10 @@ void printShapeInfo(const std::shared_ptr<Shape>& shape, const std::string& titl
         std::cout << OUTPUT_FILL_COLOR << shape->fillColor << NEWLINE;
     }
 }
+// Вывод:
+// === TITLE ===
+// Rectangle [(10.00, 10.00), (20.00, 10.00), (20.00, 20.00), (10.00, 20.00)]
+// Area: 100.00
+// Perimeter: 40.00
+// Outline color: #FF0000
+// Fill color: #00FF00

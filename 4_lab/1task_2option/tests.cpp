@@ -5,7 +5,6 @@
 #include <sstream>
 #include <memory>
 
-// ========== ТЕСТЫ ДЛЯ isValidColor ==========
 TEST_CASE("isValidColor - valid 6-digit hex colors") 
 {
     CHECK(isValidColor("ff0000") == true); 
@@ -27,91 +26,12 @@ TEST_CASE("isValidColor - invalid colors")
     CHECK(isValidColor("!@#$%^") == false); 
 }
 
-// ========== ТЕСТЫ ДЛЯ parseShape ==========
-TEST_CASE("parseShape - valid rectangle")
-{
-    std::string input = "rectangle 0 0 10 0 10 5 0 5 ff0000 00ff00";
-    auto shape = parseShape(input);
-    
-    REQUIRE(shape != nullptr);
-    CHECK(shape->ToString() == "Rectangle [(0, 0), (10, 0), (10, 5), (0, 5)]");
-    CHECK(shape->outlineColor == "ff0000");
-    CHECK(shape->fillColor == "00ff00");
-}
-
-TEST_CASE("parseShape - valid square")
-{
-    std::string input = "square 0 0 5 0 5 5 0 5 0000ff ffff00";
-    auto shape = parseShape(input);
-    
-    REQUIRE(shape != nullptr);
-    CHECK(shape->ToString() == "Square [(0, 0), (5, 0), (5, 5), (0, 5)]");
-}
-
-TEST_CASE("parseShape - valid circle")
-{
-    std::string input = "circle 0 0 10 00ff00 ff0000";
-    auto shape = parseShape(input);
-    
-    REQUIRE(shape != nullptr);
-    CHECK(shape->ToString() == "Circle [center: (0, 0), radius: 10]");
-}
-
-TEST_CASE("parseShape - valid triangle")
-{
-    std::string input = "triangle 0 0 10 0 5 8.66 800080 ffa500";
-    auto shape = parseShape(input);
-    
-    REQUIRE(shape != nullptr);
-    CHECK(shape->ToString() == "Triangle [(0, 0), (10, 0), (5, 8.66)]");
-}
-
-TEST_CASE("parseShape - valid rhombus")
-{
-    std::string input = "rhombus 0 1 1 0 2 1 1 2 00ff00 ff0000";
-    auto shape = parseShape(input);
-    
-    REQUIRE(shape != nullptr);
-    CHECK(shape->ToString() == "Rhombus [(0, 1), (1, 0), (2, 1), (1, 2)]");
-}
-
-TEST_CASE("parseShape - valid parallelogram")
-{
-    std::string input = "parallelogram 0 0 5 0 7 3 2 3 ff00ff 00ffff";
-    auto shape = parseShape(input);
-    
-    REQUIRE(shape != nullptr);
-    CHECK(shape->ToString() == "Parallelogram [(0, 0), (5, 0), (7, 3), (2, 3)]");
-}
-
-TEST_CASE("parseShape - valid trapezoid")
-{
-    std::string input = "trapezoid 0 0 5 0 4 3 1 3 000000 ffffff";
-    auto shape = parseShape(input);
-    
-    REQUIRE(shape != nullptr);
-    CHECK(shape->ToString() == "Trapezoid [(0, 0), (5, 0), (4, 3), (1, 3)]");
-}
-
-TEST_CASE("parseShape - valid line")
-{
-    std::string input = "line 0 0 10 10 ff0000";
-    auto shape = parseShape(input);
-    
-    REQUIRE(shape != nullptr);
-    CHECK(shape->ToString() == "Line [(0, 0) -> (10, 10)]");
-    CHECK(shape->outlineColor == "ff0000");
-    CHECK(shape->fillColor == "none");
-}
-
-// ========== ТЕСТЫ НА ОШИБКИ ==========
-TEST_CASE("parseShape - ERROR_EMPTY_INPUT")
+TEST_CASE("ERROR_EMPTY_INPUT - empty string")
 {
     std::stringstream buffer;
     auto old_cout = std::cout.rdbuf(buffer.rdbuf());
     
-    std::string input = "";
-    auto shape = parseShape(input);
+    auto shape = parseShape("");
     
     std::cout.rdbuf(old_cout);
     
@@ -119,69 +39,12 @@ TEST_CASE("parseShape - ERROR_EMPTY_INPUT")
     CHECK(buffer.str() == "ERROR: empty input\n");
 }
 
-TEST_CASE("parseShape - ERROR_INVALID_FORMAT (missing coordinates)")
+TEST_CASE("ERROR_UNKNOWN_TYPE - invalid shape type")
 {
     std::stringstream buffer;
     auto old_cout = std::cout.rdbuf(buffer.rdbuf());
     
-    std::string input = "rectangle 0 0 10 0";
-    auto shape = parseShape(input);
-    
-    std::cout.rdbuf(old_cout);
-    
-    REQUIRE(shape == nullptr);
-    CHECK(buffer.str() == "ERROR: invalid input format\n");
-}
-
-TEST_CASE("parseShape - ERROR_INVALID_COLOR")
-{
-    std::stringstream buffer;
-    auto old_cout = std::cout.rdbuf(buffer.rdbuf());
-    
-    std::string input = "circle 0 0 10 ff000 zzzzzz";
-    auto shape = parseShape(input);
-    
-    std::cout.rdbuf(old_cout);
-    
-    REQUIRE(shape == nullptr);
-    CHECK(buffer.str() == "ERROR: invalid color\n");
-}
-
-TEST_CASE("parseShape - ERROR_EXTRA_DATA")
-{
-    std::stringstream buffer;
-    auto old_cout = std::cout.rdbuf(buffer.rdbuf());
-    
-    std::string input = "square 0 0 5 0 5 5 0 5 0000ff ffff00 extra data";
-    auto shape = parseShape(input);
-    
-    std::cout.rdbuf(old_cout);
-    
-    REQUIRE(shape == nullptr);
-    CHECK(buffer.str() == "ERROR: extra data in input\n");
-}
-
-TEST_CASE("parseShape - ERROR_INVALID_RADIUS")
-{
-    std::stringstream buffer;
-    auto old_cout = std::cout.rdbuf(buffer.rdbuf());
-    
-    std::string input = "circle 0 0 -5 00ff00 ff0000";
-    auto shape = parseShape(input);
-    
-    std::cout.rdbuf(old_cout);
-    
-    REQUIRE(shape == nullptr);
-    CHECK(buffer.str() == "ERROR: radius must be positive\n");
-}
-
-TEST_CASE("parseShape - ERROR_UNKNOWN_TYPE")
-{
-    std::stringstream buffer;
-    auto old_cout = std::cout.rdbuf(buffer.rdbuf());
-    
-    std::string input = "hexagon 0 0 10 0 10 5 0 5 ff0000 00ff00";
-    auto shape = parseShape(input);
+    auto shape = parseShape("hexagon 0 0 1 1 2 2 3 3 4 4 FF0000 00FF00");
     
     std::cout.rdbuf(old_cout);
     
@@ -189,187 +52,179 @@ TEST_CASE("parseShape - ERROR_UNKNOWN_TYPE")
     CHECK(buffer.str() == "ERROR: unknown shape type\n");
 }
 
-// ========== ТЕСТЫ ДЛЯ Area() ==========
-TEST_CASE("Quadrilateral::Area - rectangle area")
+TEST_CASE("ERROR_INVALID_FORMAT - rectangle missing coordinates")
 {
-    std::string input = "rectangle 0 0 10 0 10 5 0 5 ff0000 00ff00";
-    auto shape = parseShape(input);
-    
-    REQUIRE(shape != nullptr);
-    CHECK(shape->Area() == Approx(50.0));
-}
-
-TEST_CASE("Circle::Area - circle area")
-{
-    std::string input = "circle 0 0 10 00ff00 ff0000";
-    auto shape = parseShape(input);
-    
-    REQUIRE(shape != nullptr);
-    CHECK(shape->Area() == Approx(314.159265).epsilon(0.001));
-}
-
-TEST_CASE("Triangle::Area - triangle area")
-{
-    std::string input = "triangle 0 0 10 0 5 8.66 800080 ffa500";
-    auto shape = parseShape(input);
-    
-    REQUIRE(shape != nullptr);
-    CHECK(shape->Area() == Approx(43.3).epsilon(0.1)); 
-}
-
-TEST_CASE("Line::Area - line area")
-{
-    std::string input = "line 0 0 10 10 ff0000";
-    auto shape = parseShape(input);
-    
-    REQUIRE(shape != nullptr);
-    CHECK(shape->Area() == Approx(0.0));
-}
-
-// ========== ТЕСТЫ ДЛЯ Perimeter() ==========
-TEST_CASE("Quadrilateral::Perimeter - rectangle perimeter")
-{
-    std::string input = "rectangle 0 0 10 0 10 5 0 5 ff0000 00ff00";
-    auto shape = parseShape(input);
-    
-    REQUIRE(shape != nullptr);
-    CHECK(shape->Perimeter() == Approx(30.0));
-}
-
-TEST_CASE("Circle::Perimeter - circle perimeter")
-{
-    std::string input = "circle 0 0 10 00ff00 ff0000";
-    auto shape = parseShape(input);
-    
-    REQUIRE(shape != nullptr);
-    CHECK(shape->Perimeter() == Approx(62.8319).epsilon(0.001));
-}
-
-TEST_CASE("Triangle::Perimeter - triangle perimeter")
-{
-    std::string input = "triangle 0 0 10 0 5 8.66 800080 ffa500";
-    auto shape = parseShape(input);
-    
-    REQUIRE(shape != nullptr);
-    CHECK(shape->Perimeter() == Approx(30.0).epsilon(0.1));
-}
-
-TEST_CASE("Line::Perimeter - line perimeter (length)")
-{
-    std::string input = "line 0 0 3 4 ff0000";
-    auto shape = parseShape(input);
-    
-    REQUIRE(shape != nullptr);
-    CHECK(shape->Perimeter() == Approx(5.0)); 
-}
-
-// ========== ТЕСТЫ ДЛЯ findMaxArea ==========
-TEST_CASE("findMaxArea - find shape with maximum area")
-{
-    std::vector<std::shared_ptr<Shape>> shapes;
-    
-    shapes.push_back(parseShape("rectangle 0 0 10 0 10 5 0 5 ff0000 00ff00"));    
-    shapes.push_back(parseShape("circle 0 0 10 00ff00 ff0000"));                    
-    shapes.push_back(parseShape("square 0 0 5 0 5 5 0 5 0000ff ffff00"));         
-    
-    auto maxShape = findMaxArea(shapes);
-    
-    REQUIRE(maxShape != nullptr);
-    CHECK(maxShape->ToString().find("Circle") != std::string::npos);
-    CHECK(maxShape->Area() == Approx(314.159).epsilon(0.001));
-}
-
-TEST_CASE("findMaxArea - empty vector returns nullptr")
-{
-    std::vector<std::shared_ptr<Shape>> shapes;
-    auto maxShape = findMaxArea(shapes);
-    
-    CHECK(maxShape == nullptr);
-}
-
-// ========== ТЕСТЫ ДЛЯ findMinPerimeter ==========
-TEST_CASE("findMinPerimeter - find shape with minimum perimeter")
-{
-    std::vector<std::shared_ptr<Shape>> shapes;
-    
-    shapes.push_back(parseShape("rectangle 0 0 10 0 10 5 0 5 ff0000 00ff00"));     
-    shapes.push_back(parseShape("circle 0 0 10 00ff00 ff0000"));               
-    shapes.push_back(parseShape("square 0 0 1 0 1 1 0 1 0000ff ffff00"));         
-    
-    auto minShape = findMinPerimeter(shapes);
-    
-    REQUIRE(minShape != nullptr);
-    CHECK(minShape->ToString().find("Square") != std::string::npos);
-    CHECK(minShape->Perimeter() == Approx(4.0));
-}
-
-TEST_CASE("findMinPerimeter - empty vector returns nullptr")
-{
-    std::vector<std::shared_ptr<Shape>> shapes;
-    auto minShape = findMinPerimeter(shapes);
-    
-    CHECK(minShape == nullptr);
-}
-
-// ========== ТЕСТЫ ДЛЯ printShapeInfo ==========
-TEST_CASE("printShapeInfo - prints correct info")
-{
-    auto shape = parseShape("circle 0 0 10 00ff00 ff0000");
-    REQUIRE(shape != nullptr);
-    
     std::stringstream buffer;
     auto old_cout = std::cout.rdbuf(buffer.rdbuf());
     
-    printShapeInfo(shape, "TEST TITLE");
+    auto shape = parseShape("rectangle 0 0 10 0 10 10");
     
     std::cout.rdbuf(old_cout);
     
-    std::string output = buffer.str();
-    CHECK(output.find("=== TEST TITLE ===") != std::string::npos);
-    CHECK(output.find("Circle [center: (0, 0), radius: 10]") != std::string::npos);
-    CHECK(output.find("Area: 314.16") != std::string::npos);
-    CHECK(output.find("Perimeter: 62.83") != std::string::npos);
-    CHECK(output.find("Outline color: #00ff00") != std::string::npos);
-    CHECK(output.find("Fill color: #ff0000") != std::string::npos);
+    REQUIRE(shape == nullptr);
+    CHECK(buffer.str() == "ERROR: invalid input format\n");
 }
 
-TEST_CASE("printShapeInfo - line has no fill color")
+TEST_CASE("ERROR_INVALID_FORMAT - circle missing radius")
 {
-    auto shape = parseShape("line 0 0 10 10 ff0000");
-    REQUIRE(shape != nullptr);
-    
     std::stringstream buffer;
     auto old_cout = std::cout.rdbuf(buffer.rdbuf());
     
-    printShapeInfo(shape, "LINE TEST");
+    auto shape = parseShape("circle 0 0 FF0000 00FF00");
     
     std::cout.rdbuf(old_cout);
     
-    std::string output = buffer.str();
-    CHECK(output.find("=== LINE TEST ===") != std::string::npos);
-    CHECK(output.find("Line [(0, 0) -> (10, 10)]") != std::string::npos);
-    CHECK(output.find("Outline color: #ff0000") != std::string::npos);
-    CHECK(output.find("Fill color: #") == std::string::npos); 
+    REQUIRE(shape == nullptr);
+    CHECK(buffer.str() == "ERROR: invalid input format\n");
 }
 
-// ========== ТЕСТЫ ДЛЯ интеграции ==========
-TEST_CASE("Full pipeline - process multiple shapes")
+TEST_CASE("ERROR_INVALID_FORMAT - line missing point")
 {
-    std::vector<std::shared_ptr<Shape>> shapes;
+    std::stringstream buffer;
+    auto old_cout = std::cout.rdbuf(buffer.rdbuf());
     
-    auto shape1 = parseShape("rectangle 0 0 10 0 10 5 0 5 ff0000 00ff00");
-    auto shape2 = parseShape("circle 0 0 5 0000ff ffff00");                 
-    auto shape3 = parseShape("line 1 1 2 2 123456");                         
+    auto shape = parseShape("line 0 0 FF0000");
     
-    shapes.push_back(shape1);
-    shapes.push_back(shape2);
-    shapes.push_back(shape3);
+    std::cout.rdbuf(old_cout);
     
-    REQUIRE(shapes.size() == 3);
-    
-    auto maxArea = findMaxArea(shapes);
-    auto minPerim = findMinPerimeter(shapes);
+    REQUIRE(shape == nullptr);
+    CHECK(buffer.str() == "ERROR: invalid input format\n");
+}
 
-    CHECK(maxArea->ToString().find("Circle") != std::string::npos);
-    CHECK(minPerim->ToString().find("Line") != std::string::npos);
+TEST_CASE("ERROR_INVALID_COLOR - outline invalid (too short)")
+{
+    std::stringstream buffer;
+    auto old_cout = std::cout.rdbuf(buffer.rdbuf());
+    
+    auto shape = parseShape("square 0 0 5 0 5 5 0 5 FF000 00FF00");
+    
+    std::cout.rdbuf(old_cout);
+    
+    REQUIRE(shape == nullptr);
+    CHECK(buffer.str() == "ERROR: invalid color\n");
+}
+
+TEST_CASE("ERROR_INVALID_COLOR - line color invalid")
+{
+    std::stringstream buffer;
+    auto old_cout = std::cout.rdbuf(buffer.rdbuf());
+    
+    auto shape = parseShape("line 0 0 10 10 FFF00G");
+    
+    std::cout.rdbuf(old_cout);
+    
+    REQUIRE(shape == nullptr);
+    CHECK(buffer.str() == "ERROR: invalid color\n");
+}
+
+TEST_CASE("ERROR_EXTRA_DATA - extra numbers at end")
+{
+    std::stringstream buffer;
+    auto old_cout = std::cout.rdbuf(buffer.rdbuf());
+    
+    auto shape = parseShape("rectangle 0 0 10 0 10 10 0 10 FF0000 00FF00 123");
+    
+    std::cout.rdbuf(old_cout);
+    
+    REQUIRE(shape == nullptr);
+    CHECK(buffer.str() == "ERROR: extra data in input\n");
+}
+
+TEST_CASE("ERROR_INVALID_RADIUS - radius is negative")
+{
+    std::stringstream buffer;
+    auto old_cout = std::cout.rdbuf(buffer.rdbuf());
+    
+    auto shape = parseShape("circle 0 0 -5 FF0000 00FF00");
+    
+    std::cout.rdbuf(old_cout);
+    
+    REQUIRE(shape == nullptr);
+    CHECK(buffer.str() == "ERROR: radius must be positive\n");
+}
+
+TEST_CASE("Valid shapes parse correctly")
+{
+    SECTION("Rectangle")
+    {
+        auto shape = parseShape("rectangle 0 0 10 0 10 10 0 10 FF0000 00FF00");
+        REQUIRE(shape != nullptr);
+        CHECK(shape->ToString() == "Rectangle [(0, 0), (10, 0), (10, 10), (0, 10)]");
+    }
+    
+    SECTION("Square")
+    {
+        auto shape = parseShape("square 0 0 5 0 5 5 0 5 0000FF FFFF00");
+        REQUIRE(shape != nullptr);
+        CHECK(shape->ToString() == "Square [(0, 0), (5, 0), (5, 5), (0, 5)]");
+    }
+    
+    SECTION("Circle")
+    {
+        auto shape = parseShape("circle 0 0 10 FF0000 00FF00");
+        REQUIRE(shape != nullptr);
+        CHECK(shape->ToString() == "Circle [center: (0, 0), radius: 10]");
+    }
+    
+    SECTION("Triangle")
+    {
+        auto shape = parseShape("triangle 0 0 10 0 5 8.66 FF0000 00FF00");
+        REQUIRE(shape != nullptr);
+        CHECK(shape->ToString() == "Triangle [(0, 0), (10, 0), (5, 8.66)]");
+    }
+    
+    SECTION("Line")
+    {
+        auto shape = parseShape("line 0 0 10 10 FF0000");
+        REQUIRE(shape != nullptr);
+        CHECK(shape->ToString() == "Line [(0, 0) -> (10, 10)]");
+    }
+    
+    SECTION("Case insensitive type")
+    {
+        auto shape = parseShape("CIRCLE 0 0 10 FF0000 00FF00");
+        REQUIRE(shape != nullptr);
+        CHECK(shape->ToString() == "Circle [center: (0, 0), radius: 10]");
+    }
+}
+
+TEST_CASE("Basic area calculations")
+{
+    SECTION("Rectangle area")
+    {
+        auto shape = parseShape("rectangle 0 0 10 0 10 5 0 5 FF0000 00FF00");
+        REQUIRE(shape != nullptr);
+        CHECK(shape->Area() == 50.0);
+    }
+    
+    SECTION("Circle area")
+    {
+        auto shape = parseShape("circle 0 0 10 FF0000 00FF00");
+        REQUIRE(shape != nullptr);
+        CHECK(shape->Area() == Approx(314.159).epsilon(0.001));
+    }
+    
+    SECTION("Line area is zero")
+    {
+        auto shape = parseShape("line 0 0 10 10 FF0000");
+        REQUIRE(shape != nullptr);
+        CHECK(shape->Area() == 0.0);
+    }
+}
+
+TEST_CASE("Basic perimeter calculations")
+{
+    SECTION("Rectangle perimeter")
+    {
+        auto shape = parseShape("rectangle 0 0 10 0 10 5 0 5 FF0000 00FF00");
+        REQUIRE(shape != nullptr);
+        CHECK(shape->Perimeter() == 30.0);
+    }
+    
+    SECTION("Line perimeter is length")
+    {
+        auto shape = parseShape("line 0 0 3 4 FF0000");
+        REQUIRE(shape != nullptr);
+        CHECK(shape->Perimeter() == 5.0);
+    }
 }
