@@ -20,12 +20,18 @@ double CRectangle::GetPerimeter() const
 
 std::string CRectangle::ToString() const
 {
-    CPoint rightBottom(m_leftTop.x + m_width, m_leftTop.y + m_height);
-    
+    double x = m_leftTop.x;
+    double y = m_leftTop.y;
+    double w = m_width;
+    double h = m_height;
+
     std::ostringstream oss;
-    oss << Config::RECTANGLE_FORMAT
-        << m_leftTop.x << Config::COMMA_SPACE << m_leftTop.y << Config::COMMA_CLOSE
-        << rightBottom.x << Config::COMMA_SPACE << rightBottom.y << Config::CLOSE_BRACKET;
+    oss << "Rectangle [("
+        << x << ", " << y << "), ("
+        << x + w << ", " << y << "), ("
+        << x + w << ", " << y + h << "), ("
+        << x << ", " << y + h << ")]";
+
     return oss.str();
 }
 

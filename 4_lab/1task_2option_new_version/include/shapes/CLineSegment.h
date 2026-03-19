@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../interfaces/IShape.h
+#include "../interfaces/IShape.h"
 #include "CPoint.h"
 #include <cstdint>
 

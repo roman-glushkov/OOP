@@ -20,15 +20,20 @@ double CSquare::GetPerimeter() const
 
 std::string CSquare::ToString() const
 {
-    CPoint rightBottom(m_leftTop.x + m_side, m_leftTop.y + m_side);
-    
+    CPoint lt = m_leftTop;
+    CPoint rt(m_leftTop.x + m_side, m_leftTop.y);
+    CPoint rb(m_leftTop.x + m_side, m_leftTop.y + m_side);
+    CPoint lb(m_leftTop.x, m_leftTop.y + m_side);
+
     std::ostringstream oss;
-    oss << Config::SQUARE_FORMAT
-        << m_leftTop.x << Config::COMMA_SPACE << m_leftTop.y << Config::COMMA_CLOSE
-        << rightBottom.x << Config::COMMA_SPACE << rightBottom.y << Config::CLOSE_BRACKET;
+    oss << "Square [("
+        << lt.x << ", " << lt.y << "), ("
+        << rt.x << ", " << rt.y << "), ("
+        << rb.x << ", " << rb.y << "), ("
+        << lb.x << ", " << lb.y << ")]";
+
     return oss.str();
 }
-
 uint32_t CSquare::GetOutlineColor() const
 {
     return m_outlineColor;

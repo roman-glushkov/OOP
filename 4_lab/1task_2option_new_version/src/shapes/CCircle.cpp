@@ -10,20 +10,20 @@ CCircle::CCircle(CPoint center, double radius, uint32_t outlineColor, uint32_t f
 
 double CCircle::GetArea() const
 {
-    return M_PI * m_radius * m_radius;
+    return Config::PI * m_radius * m_radius;
 }
 
 double CCircle::GetPerimeter() const
 {
-    return 2 * M_PI * m_radius;
+    return 2 * Config::PI * m_radius;
 }
 
 std::string CCircle::ToString() const
 {
     std::ostringstream oss;
-    oss << Config::CIRCLE_FORMAT
-        << m_center.x << Config::COMMA_SPACE << m_center.y
-        << Config::RADIUS_PREFIX << m_radius << Config::CLOSE_BRACKET;
+    oss << "Circle [center: ("
+        << m_center.x << ", " << m_center.y
+        << "), radius: " << m_radius << "]";
     return oss.str();
 }
 
