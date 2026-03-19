@@ -63,8 +63,7 @@ enum class QuadrilateralType {
 class Quadrilateral : public Shape
 {
 public:
-    Quadrilateral(Point a, Point b, Point c, Point d, QuadrilateralType type, std::string outline, std::string fill) 
-    : Shape(outline, fill), p1(a), p2(b), p3(c), p4(d), type(type) {}
+    Quadrilateral(Point a, Point b, Point c, Point d, QuadrilateralType type, std::string outline, std::string fill) : Shape(outline, fill), p1(a), p2(b), p3(c), p4(d), type(type) {}
 
     double Area() const override;
     double Perimeter() const override;
