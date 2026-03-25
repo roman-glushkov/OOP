@@ -11,7 +11,7 @@ CTriangle::CTriangle(CPoint vertex1, CPoint vertex2, CPoint vertex3, uint32_t ou
 double CTriangle::GetArea() const
 {
     double area = m_vertex1.x * (m_vertex2.y - m_vertex3.y) + m_vertex2.x * (m_vertex3.y - m_vertex1.y) + m_vertex3.x * (m_vertex1.y - m_vertex2.y);
-    return std::abs(area) / 2.0;
+    return std::abs(area) / Config::DEFAULT_2;
 }
 
 double CTriangle::GetPerimeter() const

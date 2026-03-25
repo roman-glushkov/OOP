@@ -1,5 +1,4 @@
 #pragma once
-
 #include "../shapes/CPoint.h"
 #include <cmath>
 

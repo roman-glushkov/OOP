@@ -12,7 +12,7 @@ double CTrapezoid::GetArea() const
 {
     double area = m_vertex1.x * m_vertex2.y + m_vertex2.x * m_vertex3.y + m_vertex3.x * m_vertex4.y + m_vertex4.x * m_vertex1.y - 
                   m_vertex2.x * m_vertex1.y - m_vertex3.x * m_vertex2.y - m_vertex4.x * m_vertex3.y - m_vertex1.x * m_vertex4.y;
-    return std::abs(area) / 2.0;
+    return std::abs(area) / Config::DEFAULT_2;
 }
 
 double CTrapezoid::GetPerimeter() const

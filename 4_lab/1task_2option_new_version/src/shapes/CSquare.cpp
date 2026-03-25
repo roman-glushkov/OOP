@@ -15,7 +15,7 @@ double CSquare::GetArea() const
 
 double CSquare::GetPerimeter() const
 {
-    return 4 * m_side;
+    return Config::DEFAULT_4 * m_side;
 }
 
 std::string CSquare::ToString() const
@@ -26,11 +26,11 @@ std::string CSquare::ToString() const
     CPoint lb(m_leftTop.x, m_leftTop.y + m_side);
 
     std::ostringstream oss;
-    oss << "Square [("
-        << lt.x << ", " << lt.y << "), ("
-        << rt.x << ", " << rt.y << "), ("
-        << rb.x << ", " << rb.y << "), ("
-        << lb.x << ", " << lb.y << ")]";
+    oss << Config::SQUARE_FORMAT
+        << lt.x << Config::COMMA_SPACE << lt.y << Config::COMMA_CLOSE
+        << rt.x << Config::COMMA_SPACE << rt.y << Config::COMMA_CLOSE
+        << rb.x << Config::COMMA_SPACE << rb.y << Config::COMMA_CLOSE
+        << lb.x << Config::COMMA_SPACE << lb.y << Config::CLOSE_BRACKET;
 
     return oss.str();
 }

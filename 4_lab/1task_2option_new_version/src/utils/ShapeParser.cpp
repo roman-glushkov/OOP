@@ -1,5 +1,5 @@
-#include "../../include/utils/ShapeParser.h"      // было #include "ShapeParser.h"
-#include "../../include/utils/Config.h"           // было #include "Config.h"
+#include "../../include/utils/ShapeParser.h" 
+#include "../../include/utils/Config.h"    
 #include "../../include/shapes/CLineSegment.h"
 #include "shapes/CTriangle.h"
 #include "shapes/CRectangle.h"
@@ -39,8 +39,7 @@ std::shared_ptr<IShape> ShapeParser::ParseShape(const std::string& line)
     }
     
     std::transform(type.begin(), type.end(), type.begin(), ::tolower);
-    
-    // Парсинг линии (отрезка)
+
     if (type == Config::SHAPE_LINE) {
         double x1, y1, x2, y2;
         std::string outlineColorStr;
@@ -64,8 +63,7 @@ std::shared_ptr<IShape> ShapeParser::ParseShape(const std::string& line)
         uint32_t outlineColor = ColorStringToUint32(outlineColorStr);
         return std::make_shared<CLineSegment>(CPoint(x1, y1), CPoint(x2, y2), outlineColor);
     }
-    
-    // Парсинг треугольника
+
     if (type == Config::SHAPE_TRIANGLE) {
         double x1, y1, x2, y2, x3, y3;
         std::string outlineColorStr, fillColorStr;
@@ -91,8 +89,7 @@ std::shared_ptr<IShape> ShapeParser::ParseShape(const std::string& line)
         
         return std::make_shared<CTriangle>(CPoint(x1, y1), CPoint(x2, y2), CPoint(x3, y3), outlineColor, fillColor);
     }
-    
-    // Парсинг прямоугольника
+
     if (type == Config::SHAPE_RECTANGLE) {
         double x, y, width, height;
         std::string outlineColorStr, fillColorStr;
@@ -118,8 +115,7 @@ std::shared_ptr<IShape> ShapeParser::ParseShape(const std::string& line)
         
         return std::make_shared<CRectangle>(CPoint(x, y), width, height, outlineColor, fillColor);
     }
-    
-    // Парсинг круга
+
     if (type == Config::SHAPE_CIRCLE) {
         double x, y, radius;
         std::string outlineColorStr, fillColorStr;
@@ -150,8 +146,7 @@ std::shared_ptr<IShape> ShapeParser::ParseShape(const std::string& line)
         
         return std::make_shared<CCircle>(CPoint(x, y), radius, outlineColor, fillColor);
     }
-    
-    // Парсинг квадрата
+
     if (type == Config::SHAPE_SQUARE) {
         double x, y, side;
         std::string outlineColorStr, fillColorStr;
@@ -177,8 +172,7 @@ std::shared_ptr<IShape> ShapeParser::ParseShape(const std::string& line)
         
         return std::make_shared<CSquare>(CPoint(x, y), side, outlineColor, fillColor);
     }
-    
-    // Парсинг ромба
+
     if (type == Config::SHAPE_RHOMBUS) {
         double x, y, diag1, diag2;
         std::string outlineColorStr, fillColorStr;
@@ -204,8 +198,7 @@ std::shared_ptr<IShape> ShapeParser::ParseShape(const std::string& line)
         
         return std::make_shared<CRhombus>(CPoint(x, y), diag1, diag2, outlineColor, fillColor);
     }
-    
-    // Парсинг параллелограмма
+
     if (type == Config::SHAPE_PARALLELOGRAM) {
         double x1, y1, x2, y2, x3, y3;
         std::string outlineColorStr, fillColorStr;
@@ -231,8 +224,7 @@ std::shared_ptr<IShape> ShapeParser::ParseShape(const std::string& line)
         
         return std::make_shared<CParallelogram>(CPoint(x1, y1), CPoint(x2, y2), CPoint(x3, y3), outlineColor, fillColor);
     }
-    
-    // Парсинг трапеции
+
     if (type == Config::SHAPE_TRAPEZOID) {
         double x1, y1, x2, y2, x3, y3, x4, y4;
         std::string outlineColorStr, fillColorStr;

@@ -1,5 +1,4 @@
 #pragma once
-
 #include "../interfaces/ISolidShape.h"
 #include "CPoint.h"
 #include <cstdint>

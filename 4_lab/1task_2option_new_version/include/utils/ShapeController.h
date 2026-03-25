@@ -1,5 +1,4 @@
 #pragma once
-
 #include <string>
 #include <vector>
 #include <memory>
@@ -13,7 +12,6 @@ public:
     
 private:
     std::vector<std::shared_ptr<IShape>> m_shapes;
-    
     std::shared_ptr<IShape> FindMaxArea() const;
     std::shared_ptr<IShape> FindMinPerimeter() const;
     void PrintShapeInfo(const std::shared_ptr<IShape>& shape, const std::string& title) const;

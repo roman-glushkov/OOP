@@ -15,15 +15,15 @@ double CCircle::GetArea() const
 
 double CCircle::GetPerimeter() const
 {
-    return 2 * Config::PI * m_radius;
+    return Config::DEFAULT_2 * Config::PI * m_radius;
 }
 
 std::string CCircle::ToString() const
 {
     std::ostringstream oss;
-    oss << "Circle [center: ("
-        << m_center.x << ", " << m_center.y
-        << "), radius: " << m_radius << "]";
+    oss << Config::CIRCLE_FORMAT
+        << m_center.x << Config::COMMA_SPACE << m_center.y
+        << Config::RADIUS_PREFIX << m_radius << Config::CLOSE_BRACKET;
     return oss.str();
 }
 

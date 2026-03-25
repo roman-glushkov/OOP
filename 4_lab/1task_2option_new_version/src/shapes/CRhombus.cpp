@@ -10,15 +10,15 @@ CRhombus::CRhombus(CPoint center, double diagonal1, double diagonal2, uint32_t o
 
 double CRhombus::GetArea() const
 {
-    return (m_diagonal1 * m_diagonal2) / 2.0;
+    return (m_diagonal1 * m_diagonal2) / Config::DEFAULT_2;
 }
 
 double CRhombus::GetPerimeter() const
 {
-    double halfD1 = m_diagonal1 / 2.0;
-    double halfD2 = m_diagonal2 / 2.0;
+    double halfD1 = m_diagonal1 / Config::DEFAULT_2;
+    double halfD2 = m_diagonal2 / Config::DEFAULT_2;
     double side = std::sqrt(halfD1 * halfD1 + halfD2 * halfD2);
-    return 4 * side;
+    return Config::DEFAULT_4 * side;
 }
 
 std::string CRhombus::ToString() const
@@ -44,22 +44,22 @@ uint32_t CRhombus::GetFillColor() const
 
 CPoint CRhombus::GetVertex1() const
 {
-    return CPoint(m_center.x, m_center.y - m_diagonal1 / 2.0);
+    return CPoint(m_center.x, m_center.y - m_diagonal1 / Config::DEFAULT_2);
 }
 
 CPoint CRhombus::GetVertex2() const
 {
-    return CPoint(m_center.x + m_diagonal2 / 2.0, m_center.y);
+    return CPoint(m_center.x + m_diagonal2 / Config::DEFAULT_2, m_center.y);
 }
 
 CPoint CRhombus::GetVertex3() const
 {
-    return CPoint(m_center.x, m_center.y + m_diagonal1 / 2.0);
+    return CPoint(m_center.x, m_center.y + m_diagonal1 / Config::DEFAULT_2);
 }
 
 CPoint CRhombus::GetVertex4() const
 {
-    return CPoint(m_center.x - m_diagonal2 / 2.0, m_center.y);
+    return CPoint(m_center.x - m_diagonal2 / Config::DEFAULT_2, m_center.y);
 }
 
 CPoint CRhombus::GetCenter() const

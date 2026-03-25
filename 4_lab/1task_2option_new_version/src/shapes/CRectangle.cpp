@@ -15,7 +15,7 @@ double CRectangle::GetArea() const
 
 double CRectangle::GetPerimeter() const
 {
-    return 2 * (m_width + m_height);
+    return Config::DEFAULT_2 * (m_width + m_height);
 }
 
 std::string CRectangle::ToString() const
@@ -26,11 +26,11 @@ std::string CRectangle::ToString() const
     double h = m_height;
 
     std::ostringstream oss;
-    oss << "Rectangle [("
-        << x << ", " << y << "), ("
-        << x + w << ", " << y << "), ("
-        << x + w << ", " << y + h << "), ("
-        << x << ", " << y + h << ")]";
+    oss << Config::RECTANGLE_FORMAT
+        << x << Config::COMMA_SPACE << y << Config::COMMA_CLOSE
+        << x + w << Config::COMMA_SPACE << y << Config::COMMA_CLOSE
+        << x + w << Config::COMMA_SPACE << y + h << Config::COMMA_CLOSE
+        << x << Config::COMMA_SPACE << y + h << Config::CLOSE_BRACKET;
 
     return oss.str();
 }

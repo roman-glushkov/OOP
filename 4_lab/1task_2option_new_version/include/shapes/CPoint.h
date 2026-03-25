@@ -1,5 +1,4 @@
 #pragma once
-
 #include "../utils/Config.h"
 
 class CPoint

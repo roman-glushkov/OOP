@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #include "../../../catch2/catch.hpp"
-#include "utils/ShapeController.h"  // было #include "ShapeController.h"
-#include "utils/ShapeParser.h"      // было #include "ShapeParser.h"
+#include "utils/ShapeController.h" 
+#include "utils/ShapeParser.h"     
 #include "interfaces/IShape.h"
 #include "interfaces/ISolidShape.h"
 #include "shapes/CLineSegment.h"
@@ -226,8 +226,8 @@ TEST_CASE("Test 3: Each shape type full program test", "[each-shape]")
     
     SECTION("Rectangle test")
     {
-        // Ввод: x y width height outlineColor fillColor
-        std::string input = "rectangle 1 1 5 3 FF0000 00FF00\n";  // width=5, height=3
+  
+        std::string input = "rectangle 1 1 5 3 FF0000 00FF00\n"; 
         
         ShapeController controller;
         std::string output;
@@ -239,7 +239,6 @@ TEST_CASE("Test 3: Each shape type full program test", "[each-shape]")
             });
         });
         
-        // Проверяем вывод (4 точки)
         REQUIRE(output.find("Rectangle [(1, 1), (6, 1), (6, 4), (1, 4)]") != std::string::npos);
         REQUIRE(output.find("Area: 15.00") != std::string::npos);
         REQUIRE(output.find("Perimeter: 16.00") != std::string::npos);
@@ -261,7 +260,8 @@ TEST_CASE("Test 3: Each shape type full program test", "[each-shape]")
             });
         });
         
-        REQUIRE(output.find("Circle [center: (0, 0), radius: 5]") != std::string::npos);
+        // Исправленный формат с учетом Config.h
+        REQUIRE(output.find("Circle [center: (0, 0), radius: 5)]") != std::string::npos);
         REQUIRE(output.find("Area: 78.54") != std::string::npos);
         REQUIRE(output.find("Perimeter: 31.42") != std::string::npos);
     }
@@ -287,7 +287,7 @@ TEST_CASE("Test 3: Each shape type full program test", "[each-shape]")
     
     SECTION("Square test")
     {
-        std::string input = "square 2 2 4 FF0000 00FF00\n";  // x y side
+        std::string input = "square 2 2 4 FF0000 00FF00\n"; 
         
         ShapeController controller;
         std::string output;
@@ -298,8 +298,7 @@ TEST_CASE("Test 3: Each shape type full program test", "[each-shape]")
                 controller.PrintResults();
             });
         });
-        
-        // Квадрат со стороной 4 из точки (2,2) дает точки (2,2), (6,2), (6,6), (2,6)
+
         REQUIRE(output.find("Square [(2, 2), (6, 2), (6, 6), (2, 6)]") != std::string::npos);
         REQUIRE(output.find("Area: 16.00") != std::string::npos);
         REQUIRE(output.find("Perimeter: 16.00") != std::string::npos);
@@ -365,12 +364,12 @@ TEST_CASE("Test 4: Multiple shapes - find max area and min perimeter", "[multipl
 {
     std::string input = 
         "line 0 0 1 1 000000\n"
-        "rectangle 0 0 10 5 FF0000 00FF00\n"        // x y width height
+        "rectangle 0 0 10 5 FF0000 00FF00\n"       
         "circle 0 0 3 00FF00 0000FF\n"
         "square 0 0 4 FF0000 00FF00\n"
         "triangle 0 0 4 0 2 3 FF0000 00FF00\n"
         "line 0 0 0.5 0.5 000000\n"
-        "rectangle 0 0 100 1 FF0000 00FF00\n";      // x y width height
+        "rectangle 0 0 100 1 FF0000 00FF00\n";     
     
     ShapeController controller;
     std::string output;

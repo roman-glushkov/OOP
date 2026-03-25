@@ -1,13 +1,12 @@
 #pragma once
-
 #include <string>
 
 namespace Config
 {
-    // Математические константы
     const double DEFAULT = 0.0;
-    
-    // Форматы для ToString() (для фигур)
+    const double DEFAULT_2 = 2.0;
+    const double DEFAULT_4 = 4.0;
+
     const std::string LINE_FORMAT = "Line [(";
     const std::string CIRCLE_FORMAT = "Circle [center: (";
     const std::string TRIANGLE_FORMAT = "Triangle [(";
@@ -23,15 +22,13 @@ namespace Config
     const std::string ARROW = ") -> (";
     const std::string RADIUS_PREFIX = "), radius: ";
     const std::string COMMA_CLOSE = "), (";
-    
-    // Сообщения для ввода/вывода
+
     const std::string PROMPT_ENTER_SHAPES = "Enter shapes (Ctrl+Z or Ctrl+D to end):\n";
     const std::string MSG_ADDED_PREFIX = "Added: ";
     const std::string MSG_NO_SHAPES = "\nNo shapes entered.\n";
     const std::string MSG_TOTAL_SHAPES = "\n" + std::string(50, '=') + "\nTotal shapes: ";
     const std::string MSG_SEPARATOR = "\n" + std::string(50, '=') + "\n";
-    
-    // Форматы вывода
+
     const std::string OUTPUT_TITLE_PREFIX = "\n=== ";
     const std::string OUTPUT_TITLE_SUFFIX = " ===\n";
     const std::string OUTPUT_AREA = "Area: ";
@@ -40,17 +37,14 @@ namespace Config
     const std::string OUTPUT_FILL_COLOR = "Fill color: #";
     const std::string OUTPUT_FILL_COLOR_NONE = "none";
     const std::string NEWLINE = "\n";
-    
-    // Заголовки
+
     const std::string TITLE_MAX_AREA = "SHAPE WITH MAXIMUM AREA";
     const std::string TITLE_MIN_PERIMETER = "SHAPE WITH MINIMUM PERIMETER";
-    
-    // Настройки
+
     const int OUTPUT_PRECISION = 2;
     const size_t COLOR_STRING_LENGTH = 6;
     const double PI = 3.141592653589793;
-    
-    // Ошибки
+
     const std::string ERROR_PREFIX = "ERROR: ";
     const std::string ERROR_INVALID_FORMAT = "invalid input format\n";
     const std::string ERROR_UNKNOWN_TYPE = "unknown shape type\n";
@@ -58,8 +52,7 @@ namespace Config
     const std::string ERROR_EXTRA_DATA = "extra data in input\n";
     const std::string ERROR_INVALID_RADIUS = "radius must be positive\n";
     const std::string ERROR_EMPTY_INPUT = "empty input\n";
-    
-    // Названия фигур (для парсинга)
+
     const std::string SHAPE_RECTANGLE = "rectangle";
     const std::string SHAPE_SQUARE = "square";
     const std::string SHAPE_RHOMBUS = "rhombus";

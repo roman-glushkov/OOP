@@ -1,6 +1,6 @@
-#include "../../include/utils/ShapeController.h"  // было #include "ShapeController.h"
-#include "../../include/utils/ShapeParser.h"      // было #include "ShapeParser.h"
-#include "../../include/utils/Config.h"           // было #include "Config.h"
+#include "../../include/utils/ShapeController.h"
+#include "../../include/utils/ShapeParser.h"  
+#include "../../include/utils/Config.h"       
 #include "../../include/interfaces/ISolidShape.h"
 #include <iostream>
 #include <iomanip>
@@ -60,14 +60,12 @@ void ShapeController::PrintShapeInfo(const std::shared_ptr<IShape>& shape, const
     std::cout << Config::OUTPUT_PERIMETER 
               << std::fixed << std::setprecision(Config::OUTPUT_PRECISION) 
               << shape->GetPerimeter() << Config::NEWLINE;
-    
-    // Вывод цвета обводки
+
     uint32_t outlineColor = shape->GetOutlineColor();
     std::cout << Config::OUTPUT_OUTLINE_COLOR 
               << std::hex << std::setfill('0') << std::setw(6) 
               << outlineColor << std::dec << Config::NEWLINE;
-    
-    // Пытаемся получить цвет заливки, если фигура solid
+
     auto solidShape = std::dynamic_pointer_cast<ISolidShape>(shape);
     if (solidShape) {
         uint32_t fillColor = solidShape->GetFillColor();
