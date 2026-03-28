@@ -19,23 +19,23 @@
 
 std::string CaptureOutput(std::function<void()> func)
 {
-    std::stringstream buffer;
-    auto old_cout = std::cout.rdbuf(buffer.rdbuf());
-    func();
-    std::cout.rdbuf(old_cout);
-    return buffer.str();
+    std::stringstream buffer; // создание буфера
+    auto old_cout = std::cout.rdbuf(buffer.rdbuf()); // перенаправление cout
+    func(); // вызов функции
+    std::cout.rdbuf(old_cout); // восстановление cout
+    return buffer.str(); // возращает захваченный вывод
 }
 
 void SimulateInput(const std::string& input, std::function<void()> func)
 {
-    auto old_cin = std::cin.rdbuf();
-    std::istringstream iss(input);
-    std::cin.rdbuf(iss.rdbuf());
-    func();
-    std::cin.rdbuf(old_cin);
+    auto old_cin = std::cin.rdbuf(); // сохраняем старый буфер
+    std::istringstream iss(input); // создаем поток из строки
+    std::cin.rdbuf(iss.rdbuf()); // перенаправляем cin на нашу строку
+    func(); // выполняем функцию
+    std::cin.rdbuf(old_cin); // восстанавливаем старый буфер
 }
 
-TEST_CASE("Test 1: All error messages", "[errors]")
+TEST_CASE("Test 1: All error messages")
 {
     SECTION("Empty input")
     {
@@ -118,7 +118,7 @@ TEST_CASE("Test 1: All error messages", "[errors]")
     }
 }
 
-TEST_CASE("Test 2: Direct function testing", "[direct]")
+TEST_CASE("Test 2: Direct function testing")
 {
     SECTION("CLineSegment direct test")
     {
@@ -203,7 +203,7 @@ TEST_CASE("Test 2: Direct function testing", "[direct]")
     }
 }
 
-TEST_CASE("Test 3: Each shape type full program test", "[each-shape]")
+TEST_CASE("Test 3: Each shape type full program test")
 {
     SECTION("Line segment test")
     {
@@ -259,8 +259,7 @@ TEST_CASE("Test 3: Each shape type full program test", "[each-shape]")
                 controller.PrintResults();
             });
         });
-        
-        // Исправленный формат с учетом Config.h
+
         REQUIRE(output.find("Circle [center: (0, 0), radius: 5)]") != std::string::npos);
         REQUIRE(output.find("Area: 78.54") != std::string::npos);
         REQUIRE(output.find("Perimeter: 31.42") != std::string::npos);
@@ -360,7 +359,7 @@ TEST_CASE("Test 3: Each shape type full program test", "[each-shape]")
     }
 }
 
-TEST_CASE("Test 4: Multiple shapes - find max area and min perimeter", "[multiple-shapes]")
+TEST_CASE("Test 4: Multiple shapes - find max area and min perimeter")
 {
     std::string input = 
         "line 0 0 1 1 000000\n"
