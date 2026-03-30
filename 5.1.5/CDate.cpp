@@ -1,10 +1,6 @@
 #include "CDate.h"
 
-static int CountLeapYears(unsigned year)
-{
-    year--;
-    return year / 4 - year / 100 + year / 400;
-}
+// ======================= ВСПОМОГАТЕЛЬНЫЕ =======================
 
 bool CDate::IsLeapYear(unsigned year)
 {
@@ -31,6 +27,8 @@ unsigned CDate::DaysInMonth(unsigned year, Month month)
     }
 }
 
+// ======================= ГЛАВНОЕ ИСПРАВЛЕНИЕ =======================
+
 int CDate::DateToTimestamp(unsigned day, Month month, unsigned year)
 {
     if (year < 1970 || year > 9999)
@@ -39,35 +37,21 @@ int CDate::DateToTimestamp(unsigned day, Month month, unsigned year)
     if (day == 0 || day > DaysInMonth(year, month))
         return -1;
 
-    int yearsPassed = year - 1970;
+    int days = 0;
 
-    int leapYears =
-        CountLeapYears(year) - CountLeapYears(1970);
-
-    int days = yearsPassed * 365 + leapYears;
-
-    static const int daysBeforeMonth[] =
+    // годы
+    for (unsigned y = 1970; y < year; ++y)
     {
-        0,
-        0,
-        31,
-        59,
-        90,
-        120,
-        151,
-        181,
-        212,
-        243,
-        273,
-        304,
-        334
-    };
+        days += IsLeapYear(y) ? 366 : 365;
+    }
 
-    days += daysBeforeMonth[static_cast<int>(month)];
+    // месяцы
+    for (int m = 1; m < static_cast<int>(month); ++m)
+    {
+        days += DaysInMonth(year, static_cast<Month>(m));
+    }
 
-    if (month > Month::FEBRUARY && IsLeapYear(year))
-        days += 1;
-
+    // дни
     days += day - 1;
 
     return days;
@@ -84,29 +68,22 @@ void CDate::TimestampToDate(int timestamp, unsigned& day, Month& month, unsigned
     }
 
     int days = timestamp;
-
     int y = 1970;
 
-    int cycles400 = days / 146097;
-    y += cycles400 * 400;
-    days %= 146097;
+    // годы
+    while (true)
+    {
+        int daysInYear = IsLeapYear(y) ? 366 : 365;
+        if (days < daysInYear)
+            break;
 
-    int cycles100 = days / 36524;
-    if (cycles100 == 4) cycles100 = 3;
-    y += cycles100 * 100;
-    days -= cycles100 * 36524;
-
-    int cycles4 = days / 1461;
-    y += cycles4 * 4;
-    days %= 1461;
-
-    int cycles1 = days / 365;
-    if (cycles1 == 4) cycles1 = 3;
-    y += cycles1;
-    days -= cycles1 * 365;
+        days -= daysInYear;
+        ++y;
+    }
 
     year = y;
 
+    // месяцы
     int m = 1;
     while (true)
     {
@@ -124,10 +101,12 @@ void CDate::TimestampToDate(int timestamp, unsigned& day, Month& month, unsigned
 
 WeekDay CDate::CalculateWeekDay(int timestamp)
 {
-    int d = (4 + timestamp) % 7;
+    int d = (4 + timestamp) % 7; // 01.01.1970 = Thursday = 4
     if (d < 0) d += 7;
     return static_cast<WeekDay>(d);
 }
+
+// ======================= КОНСТРУКТОРЫ =======================
 
 CDate::CDate()
     : m_timestamp(0)
@@ -135,14 +114,19 @@ CDate::CDate()
 }
 
 CDate::CDate(unsigned timestamp)
-    : m_timestamp(static_cast<int>(timestamp))
 {
+    m_timestamp = static_cast<int>(timestamp);
+
+    if (!IsValid())
+        m_timestamp = -1;
 }
 
 CDate::CDate(unsigned day, Month month, unsigned year)
 {
     m_timestamp = DateToTimestamp(day, month, year);
 }
+
+// ======================= ГЕТТЕРЫ =======================
 
 unsigned CDate::GetDay() const
 {
@@ -173,6 +157,8 @@ WeekDay CDate::GetWeekDay() const
     return CalculateWeekDay(m_timestamp);
 }
 
+// ======================= VALID =======================
+
 bool CDate::IsValid() const
 {
     if (m_timestamp < 0)
@@ -182,8 +168,16 @@ bool CDate::IsValid() const
     Month m;
     TimestampToDate(m_timestamp, d, m, y);
 
-    return y >= 1970 && y <= 9999;
+    if (y < 1970 || y > 9999)
+        return false;
+
+    if (d == 0 || d > DaysInMonth(y, m))
+        return false;
+
+    return true;
 }
+
+// ======================= ОПЕРАТОРЫ =======================
 
 CDate& CDate::operator++()
 {
@@ -208,7 +202,7 @@ CDate& CDate::operator--()
     if (IsValid())
     {
         --m_timestamp;
-        if (!IsValid())
+        if (m_timestamp < 0 || !IsValid())
             m_timestamp = -1;
     }
     return *this;
@@ -229,7 +223,7 @@ CDate CDate::operator+(int days) const
     CDate result = *this;
     result.m_timestamp += days;
 
-    if (!result.IsValid())
+    if (result.m_timestamp < 0 || !result.IsValid())
         result.m_timestamp = -1;
 
     return result;
@@ -247,6 +241,9 @@ CDate CDate::operator-(int days) const
 
 int CDate::operator-(const CDate& other) const
 {
+    if (!IsValid() || !other.IsValid())
+        return 0;
+
     return m_timestamp - other.m_timestamp;
 }
 
@@ -255,7 +252,7 @@ CDate& CDate::operator+=(int days)
     if (IsValid())
     {
         m_timestamp += days;
-        if (!IsValid())
+        if (m_timestamp < 0 || !IsValid())
             m_timestamp = -1;
     }
     return *this;
@@ -265,6 +262,8 @@ CDate& CDate::operator-=(int days)
 {
     return (*this += -days);
 }
+
+// ======================= СРАВНЕНИЯ =======================
 
 bool CDate::operator==(const CDate& other) const
 {
@@ -296,6 +295,8 @@ bool CDate::operator>=(const CDate& other) const
     return !(*this < other);
 }
 
+// ======================= I/O =======================
+
 std::ostream& operator<<(std::ostream& os, const CDate& date)
 {
     if (!date.IsValid())
@@ -322,7 +323,11 @@ std::istream& operator>>(std::istream& is, CDate& date)
 
     if (is >> d >> dot1 >> m >> dot2 >> y && dot1 == '.' && dot2 == '.')
     {
-        date = CDate(d, static_cast<Month>(m), y);
+        CDate tmp(d, static_cast<Month>(m), y);
+        if (tmp.IsValid())
+            date = tmp;
+        else
+            date.m_timestamp = -1;
     }
     else
     {
