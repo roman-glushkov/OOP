@@ -2,6 +2,7 @@
 #include "Config.h"
 #include <sstream>
 #include <cctype>
+#include <iomanip>
 
 void PrintDateDetails(const CDate& date, std::ostream& output)
 {
@@ -71,21 +72,26 @@ void CDateController::ProcessCommands(std::istream& input, std::ostream& output)
             for (char c : dateStr)
                 if (c == Config::DATE_SEPARATOR) dots++;
             
-            while (dots < Config::PAD_TO_2_DIGITS && input >> firstToken)
+            std::string nextToken;
+            while (dots < Config::PAD_TO_2_DIGITS && input >> nextToken)
             {
-                dateStr += Config::OUTPUT_SPACE + firstToken;
-                for (char c : firstToken)
+                dateStr += Config::OUTPUT_SPACE + nextToken;
+                for (char c : nextToken)
                     if (c == Config::DATE_SEPARATOR) dots++;
+                if (dots >= Config::PAD_TO_2_DIGITS) break;
             }
             
             std::istringstream dateIss(dateStr);
             CDate d1;
             dateIss >> d1;
             
-            if (!d1.IsValid() && dateStr != Config::RESULT_INVALID)
+            if (!d1.IsValid())
             {
                 output << Config::ERROR_INVALID_DATE;
-                PrintDateDetails(d1, output);
+                output << Config::RESULT_INVALID << std::endl;
+                
+                std::string remaining;
+                std::getline(input, remaining);
                 continue;
             }
             
@@ -102,16 +108,8 @@ void CDateController::ProcessCommands(std::istream& input, std::ostream& output)
                 int n;
                 if (input >> n)
                 {
-                    if (d1.IsValid())
-                    {
-                        CDate result = d1 + n;
-                        PrintDateDetails(result, output);
-                    }
-                    else
-                    {
-                        output << Config::ERROR_INVALID_DATE;
-                        PrintDateDetails(d1, output);
-                    }
+                    CDate result = d1 + n;
+                    PrintDateDetails(result, output);
                 }
                 else
                 {
@@ -121,32 +119,24 @@ void CDateController::ProcessCommands(std::istream& input, std::ostream& output)
             }
             else if (op == Config::OPERATOR_MINUS)
             {
-                if (input.peek() == EOF)
+                std::streampos pos = input.tellg();
+                std::string next;
+                
+                if (input >> next)
                 {
-                    output << Config::ERROR_MISSING_OPERAND;
-                    output << Config::RESULT_INVALID << std::endl;
-                }
-                else if (std::isdigit(static_cast<unsigned char>(input.peek())))
-                {
-                    int n;
-                    input >> n;
-                    if (d1.IsValid())
+                    if (IsNumber(next))
                     {
+                        int n = std::stoi(next);
                         CDate result = d1 - n;
                         PrintDateDetails(result, output);
                     }
                     else
                     {
-                        output << Config::ERROR_INVALID_DATE;
-                        PrintDateDetails(d1, output);
-                    }
-                }
-                else
-                {
-                    CDate d2;
-                    if (input >> d2)
-                    {
-                        if (d1.IsValid() && d2.IsValid())
+                        std::istringstream dateIss2(next);
+                        CDate d2;
+                        dateIss2 >> d2;
+                        
+                        if (d2.IsValid())
                         {
                             int diff = d1 - d2;
                             output << diff << Config::RESULT_DAYS_SUFFIX << std::endl;
@@ -157,54 +147,30 @@ void CDateController::ProcessCommands(std::istream& input, std::ostream& output)
                             output << Config::RESULT_INVALID << std::endl;
                         }
                     }
-                    else
-                    {
-                        output << Config::ERROR_MISSING_DATE;
-                        output << Config::RESULT_INVALID << std::endl;
-                    }
+                }
+                else
+                {
+                    output << Config::ERROR_MISSING_OPERAND;
+                    output << Config::RESULT_INVALID << std::endl;
                 }
             }
             else if (op == Config::OPERATOR_INCREMENT)
             {
-                if (d1.IsValid())
-                {
-                    CDate result = ++d1;
-                    PrintDateDetails(result, output);
-                }
-                else
-                {
-                    output << Config::ERROR_INVALID_INCREMENT;
-                    PrintDateDetails(d1, output);
-                }
+                CDate result = ++d1;
+                PrintDateDetails(result, output);
             }
             else if (op == Config::OPERATOR_DECREMENT)
             {
-                if (d1.IsValid())
-                {
-                    CDate result = --d1;
-                    PrintDateDetails(result, output);
-                }
-                else
-                {
-                    output << Config::ERROR_INVALID_DECREMENT;
-                    PrintDateDetails(d1, output);
-                }
+                CDate result = --d1;
+                PrintDateDetails(result, output);
             }
             else if (op == Config::OPERATOR_PLUS_EQUAL)
             {
                 int n;
                 if (input >> n)
                 {
-                    if (d1.IsValid())
-                    {
-                        d1 += n;
-                        PrintDateDetails(d1, output);
-                    }
-                    else
-                    {
-                        output << Config::ERROR_INVALID_DATE;
-                        PrintDateDetails(d1, output);
-                    }
+                    d1 += n;
+                    PrintDateDetails(d1, output);
                 }
                 else
                 {
@@ -217,16 +183,8 @@ void CDateController::ProcessCommands(std::istream& input, std::ostream& output)
                 int n;
                 if (input >> n)
                 {
-                    if (d1.IsValid())
-                    {
-                        d1 -= n;
-                        PrintDateDetails(d1, output);
-                    }
-                    else
-                    {
-                        output << Config::ERROR_INVALID_DATE;
-                        PrintDateDetails(d1, output);
-                    }
+                    d1 -= n;
+                    PrintDateDetails(d1, output);
                 }
                 else
                 {
@@ -239,10 +197,7 @@ void CDateController::ProcessCommands(std::istream& input, std::ostream& output)
                 CDate d2;
                 if (input >> d2)
                 {
-                    if (d1.IsValid() && d2.IsValid())
-                        output << (d1 == d2 ? Config::RESULT_TRUE : Config::RESULT_FALSE) << std::endl;
-                    else
-                        output << Config::ERROR_INVALID_DATE << Config::RESULT_INVALID << std::endl;
+                    output << (d1 == d2 ? Config::RESULT_TRUE : Config::RESULT_FALSE) << std::endl;
                 }
                 else
                 {
@@ -255,10 +210,7 @@ void CDateController::ProcessCommands(std::istream& input, std::ostream& output)
                 CDate d2;
                 if (input >> d2)
                 {
-                    if (d1.IsValid() && d2.IsValid())
-                        output << (d1 != d2 ? Config::RESULT_TRUE : Config::RESULT_FALSE) << std::endl;
-                    else
-                        output << Config::ERROR_INVALID_DATE << Config::RESULT_INVALID << std::endl;
+                    output << (d1 != d2 ? Config::RESULT_TRUE : Config::RESULT_FALSE) << std::endl;
                 }
                 else
                 {
@@ -271,10 +223,7 @@ void CDateController::ProcessCommands(std::istream& input, std::ostream& output)
                 CDate d2;
                 if (input >> d2)
                 {
-                    if (d1.IsValid() && d2.IsValid())
-                        output << (d1 < d2 ? Config::RESULT_TRUE : Config::RESULT_FALSE) << std::endl;
-                    else
-                        output << Config::ERROR_INVALID_DATE << Config::RESULT_INVALID << std::endl;
+                    output << (d1 < d2 ? Config::RESULT_TRUE : Config::RESULT_FALSE) << std::endl;
                 }
                 else
                 {
@@ -287,10 +236,7 @@ void CDateController::ProcessCommands(std::istream& input, std::ostream& output)
                 CDate d2;
                 if (input >> d2)
                 {
-                    if (d1.IsValid() && d2.IsValid())
-                        output << (d1 > d2 ? Config::RESULT_TRUE : Config::RESULT_FALSE) << std::endl;
-                    else
-                        output << Config::ERROR_INVALID_DATE << Config::RESULT_INVALID << std::endl;
+                    output << (d1 > d2 ? Config::RESULT_TRUE : Config::RESULT_FALSE) << std::endl;
                 }
                 else
                 {
@@ -303,10 +249,7 @@ void CDateController::ProcessCommands(std::istream& input, std::ostream& output)
                 CDate d2;
                 if (input >> d2)
                 {
-                    if (d1.IsValid() && d2.IsValid())
-                        output << (d1 <= d2 ? Config::RESULT_TRUE : Config::RESULT_FALSE) << std::endl;
-                    else
-                        output << Config::ERROR_INVALID_DATE << Config::RESULT_INVALID << std::endl;
+                    output << (d1 <= d2 ? Config::RESULT_TRUE : Config::RESULT_FALSE) << std::endl;
                 }
                 else
                 {
@@ -319,10 +262,7 @@ void CDateController::ProcessCommands(std::istream& input, std::ostream& output)
                 CDate d2;
                 if (input >> d2)
                 {
-                    if (d1.IsValid() && d2.IsValid())
-                        output << (d1 >= d2 ? Config::RESULT_TRUE : Config::RESULT_FALSE) << std::endl;
-                    else
-                        output << Config::ERROR_INVALID_DATE << Config::RESULT_INVALID << std::endl;
+                    output << (d1 >= d2 ? Config::RESULT_TRUE : Config::RESULT_FALSE) << std::endl;
                 }
                 else
                 {

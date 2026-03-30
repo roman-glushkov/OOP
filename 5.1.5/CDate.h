@@ -59,4 +59,15 @@ private:
     static int DateToTimestamp(unsigned day, Month month, unsigned year);
     static void TimestampToDate(int timestamp, unsigned& day, Month& month, unsigned& year);
     static WeekDay CalculateWeekDay(int timestamp);
+
+    friend struct TestAccess;
+};
+
+struct TestAccess
+{
+    static bool IsLeapYear(unsigned year) { return CDate::IsLeapYear(year); }
+    static unsigned DaysInMonth(unsigned year, Month month) { return CDate::DaysInMonth(year, month); }
+    static int DateToTimestamp(unsigned day, Month month, unsigned year) { return CDate::DateToTimestamp(day, month, year); }
+    static void TimestampToDate(int timestamp, unsigned& day, Month& month, unsigned& year) { CDate::TimestampToDate(timestamp, day, month, year); }
+    static WeekDay CalculateWeekDay(int timestamp) { return CDate::CalculateWeekDay(timestamp); }
 };
