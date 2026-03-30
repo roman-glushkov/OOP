@@ -1,79 +1,74 @@
 #include "CDate.h"
-
-// ======================= ВСПОМОГАТЕЛЬНЫЕ =======================
+#include "Config.h"
 
 bool CDate::IsLeapYear(unsigned year)
 {
-    return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+    return (year % Config::LEAP_YEAR_DIVISOR_4 == Config::ZERO && 
+            year % Config::LEAP_YEAR_DIVISOR_100 != Config::ZERO) || 
+           (year % Config::LEAP_YEAR_DIVISOR_400 == Config::ZERO);
 }
 
 unsigned CDate::DaysInMonth(unsigned year, Month month)
 {
     switch (month)
     {
-    case Month::JANUARY: return 31;
-    case Month::FEBRUARY: return IsLeapYear(year) ? 29 : 28;
-    case Month::MARCH: return 31;
-    case Month::APRIL: return 30;
-    case Month::MAY: return 31;
-    case Month::JUNE: return 30;
-    case Month::JULY: return 31;
-    case Month::AUGUST: return 31;
-    case Month::SEPTEMBER: return 30;
-    case Month::OCTOBER: return 31;
-    case Month::NOVEMBER: return 30;
-    case Month::DECEMBER: return 31;
-    default: return 0;
+    case Month::JANUARY:   return Config::DAYS_IN_JANUARY;
+    case Month::FEBRUARY:  return IsLeapYear(year) ? Config::DAYS_IN_FEBRUARY_LEAP : Config::DAYS_IN_FEBRUARY_NORMAL;
+    case Month::MARCH:     return Config::DAYS_IN_MARCH;
+    case Month::APRIL:     return Config::DAYS_IN_APRIL;
+    case Month::MAY:       return Config::DAYS_IN_MAY;
+    case Month::JUNE:      return Config::DAYS_IN_JUNE;
+    case Month::JULY:      return Config::DAYS_IN_JULY;
+    case Month::AUGUST:    return Config::DAYS_IN_AUGUST;
+    case Month::SEPTEMBER: return Config::DAYS_IN_SEPTEMBER;
+    case Month::OCTOBER:   return Config::DAYS_IN_OCTOBER;
+    case Month::NOVEMBER:  return Config::DAYS_IN_NOVEMBER;
+    case Month::DECEMBER:  return Config::DAYS_IN_DECEMBER;
+    default:               return Config::ZERO;
     }
 }
 
-// ======================= ГЛАВНОЕ ИСПРАВЛЕНИЕ =======================
-
 int CDate::DateToTimestamp(unsigned day, Month month, unsigned year)
 {
-    if (year < 1970 || year > 9999)
-        return -1;
+    if (year < Config::MIN_YEAR || year > Config::MAX_YEAR)
+        return Config::INVALID_TIMESTAMP;
 
-    if (day == 0 || day > DaysInMonth(year, month))
-        return -1;
+    if (day == Config::ZERO_DAY || day > DaysInMonth(year, month))
+        return Config::INVALID_TIMESTAMP;
 
-    int days = 0;
+    int days = Config::ZERO;
 
-    // годы
-    for (unsigned y = 1970; y < year; ++y)
+    for (unsigned y = Config::MIN_YEAR; y < year; ++y)
     {
-        days += IsLeapYear(y) ? 366 : 365;
+        days += IsLeapYear(y) ? Config::LEAP_YEAR_EXTRA_DAYS : Config::NORMAL_YEAR_DAYS;
     }
 
-    // месяцы
-    for (int m = 1; m < static_cast<int>(month); ++m)
+    for (int m = Config::FIRST_MONTH; m < static_cast<int>(month); ++m)
     {
         days += DaysInMonth(year, static_cast<Month>(m));
     }
 
-    // дни
-    days += day - 1;
+    days += day - Config::DAY_OFFSET;
 
     return days;
 }
 
 void CDate::TimestampToDate(int timestamp, unsigned& day, Month& month, unsigned& year)
 {
-    if (timestamp < 0)
+    if (timestamp < Config::MIN_TIMESTAMP)
     {
-        day = 0;
+        day = Config::INVALID_DAY;
         month = Month::JANUARY;
-        year = 0;
+        year = Config::INVALID_YEAR;
         return;
     }
 
     int days = timestamp;
-    int y = 1970;
+    int y = Config::MIN_YEAR;
 
-    // годы
     while (true)
     {
-        int daysInYear = IsLeapYear(y) ? 366 : 365;
+        int daysInYear = IsLeapYear(y) ? Config::LEAP_YEAR_EXTRA_DAYS : Config::NORMAL_YEAR_DAYS;
         if (days < daysInYear)
             break;
 
@@ -83,8 +78,7 @@ void CDate::TimestampToDate(int timestamp, unsigned& day, Month& month, unsigned
 
     year = y;
 
-    // месяцы
-    int m = 1;
+    int m = Config::FIRST_MONTH;
     while (true)
     {
         int dim = DaysInMonth(year, static_cast<Month>(m));
@@ -96,37 +90,32 @@ void CDate::TimestampToDate(int timestamp, unsigned& day, Month& month, unsigned
     }
 
     month = static_cast<Month>(m);
-    day = days + 1;
+    day = days + Config::TIMESTAMP_TO_DAY_OFFSET;
 }
 
 WeekDay CDate::CalculateWeekDay(int timestamp)
 {
-    int d = (4 + timestamp) % 7; // 01.01.1970 = Thursday = 4
-    if (d < 0) d += 7;
+    int d = (Config::EPOCH_WEEKDAY + timestamp) % Config::DAYS_IN_WEEK;
+    if (d < Config::WEEKDAY_MIN) 
+        d += Config::DAYS_IN_WEEK;
     return static_cast<WeekDay>(d);
 }
 
-// ======================= КОНСТРУКТОРЫ =======================
-
-CDate::CDate()
-    : m_timestamp(0)
+CDate::CDate() : m_timestamp(Config::MIN_TIMESTAMP)
 {
 }
 
 CDate::CDate(unsigned timestamp)
 {
     m_timestamp = static_cast<int>(timestamp);
-
     if (!IsValid())
-        m_timestamp = -1;
+        m_timestamp = Config::INVALID_TIMESTAMP;
 }
 
 CDate::CDate(unsigned day, Month month, unsigned year)
 {
     m_timestamp = DateToTimestamp(day, month, year);
 }
-
-// ======================= ГЕТТЕРЫ =======================
 
 unsigned CDate::GetDay() const
 {
@@ -157,27 +146,23 @@ WeekDay CDate::GetWeekDay() const
     return CalculateWeekDay(m_timestamp);
 }
 
-// ======================= VALID =======================
-
 bool CDate::IsValid() const
 {
-    if (m_timestamp < 0)
+    if (m_timestamp < Config::MIN_TIMESTAMP)
         return false;
 
     unsigned d, y;
     Month m;
     TimestampToDate(m_timestamp, d, m, y);
 
-    if (y < 1970 || y > 9999)
+    if (y < Config::MIN_YEAR || y > Config::MAX_YEAR)
         return false;
 
-    if (d == 0 || d > DaysInMonth(y, m))
+    if (d == Config::ZERO_DAY || d > DaysInMonth(y, m))
         return false;
 
     return true;
 }
-
-// ======================= ОПЕРАТОРЫ =======================
 
 CDate& CDate::operator++()
 {
@@ -185,7 +170,7 @@ CDate& CDate::operator++()
     {
         ++m_timestamp;
         if (!IsValid())
-            m_timestamp = -1;
+            m_timestamp = Config::INVALID_TIMESTAMP;
     }
     return *this;
 }
@@ -202,8 +187,8 @@ CDate& CDate::operator--()
     if (IsValid())
     {
         --m_timestamp;
-        if (m_timestamp < 0 || !IsValid())
-            m_timestamp = -1;
+        if (m_timestamp < Config::MIN_TIMESTAMP || !IsValid())
+            m_timestamp = Config::INVALID_TIMESTAMP;
     }
     return *this;
 }
@@ -223,8 +208,8 @@ CDate CDate::operator+(int days) const
     CDate result = *this;
     result.m_timestamp += days;
 
-    if (result.m_timestamp < 0 || !result.IsValid())
-        result.m_timestamp = -1;
+    if (result.m_timestamp < Config::MIN_TIMESTAMP || !result.IsValid())
+        result.m_timestamp = Config::INVALID_TIMESTAMP;
 
     return result;
 }
@@ -242,8 +227,7 @@ CDate CDate::operator-(int days) const
 int CDate::operator-(const CDate& other) const
 {
     if (!IsValid() || !other.IsValid())
-        return 0;
-
+        return Config::ZERO;
     return m_timestamp - other.m_timestamp;
 }
 
@@ -252,8 +236,8 @@ CDate& CDate::operator+=(int days)
     if (IsValid())
     {
         m_timestamp += days;
-        if (m_timestamp < 0 || !IsValid())
-            m_timestamp = -1;
+        if (m_timestamp < Config::MIN_TIMESTAMP || !IsValid())
+            m_timestamp = Config::INVALID_TIMESTAMP;
     }
     return *this;
 }
@@ -262,8 +246,6 @@ CDate& CDate::operator-=(int days)
 {
     return (*this += -days);
 }
-
-// ======================= СРАВНЕНИЯ =======================
 
 bool CDate::operator==(const CDate& other) const
 {
@@ -295,13 +277,11 @@ bool CDate::operator>=(const CDate& other) const
     return !(*this < other);
 }
 
-// ======================= I/O =======================
-
 std::ostream& operator<<(std::ostream& os, const CDate& date)
 {
     if (!date.IsValid())
     {
-        os << "INVALID";
+        os << Config::RESULT_INVALID;
         return os;
     }
 
@@ -309,9 +289,21 @@ std::ostream& operator<<(std::ostream& os, const CDate& date)
     unsigned y = date.GetYear();
     Month m = date.GetMonth();
 
-    os << (d < 10 ? "0" : "") << d << "."
-       << (static_cast<int>(m) < 10 ? "0" : "") << static_cast<int>(m) << "."
-       << y;
+    if (d < Config::SINGLE_DIGIT)
+        os << Config::ZERO_FILL;
+    os << d << Config::DATE_SEPARATOR;
+    
+    if (static_cast<int>(m) < Config::SINGLE_DIGIT)
+        os << Config::ZERO_FILL;
+    os << static_cast<int>(m) << Config::DATE_SEPARATOR;
+    
+    if (y < Config::THREE_DIGITS)
+        os << Config::ZERO_FILL;
+    if (y < Config::TWO_DIGITS)
+        os << Config::ZERO_FILL;
+    if (y < Config::ONE_DIGIT)
+        os << Config::ZERO_FILL;
+    os << y;
 
     return os;
 }
@@ -321,17 +313,17 @@ std::istream& operator>>(std::istream& is, CDate& date)
     unsigned d, m, y;
     char dot1, dot2;
 
-    if (is >> d >> dot1 >> m >> dot2 >> y && dot1 == '.' && dot2 == '.')
+    if (is >> d >> dot1 >> m >> dot2 >> y && dot1 == Config::DATE_SEPARATOR && dot2 == Config::DATE_SEPARATOR)
     {
         CDate tmp(d, static_cast<Month>(m), y);
         if (tmp.IsValid())
             date = tmp;
         else
-            date.m_timestamp = -1;
+            date.m_timestamp = Config::INVALID_TIMESTAMP;
     }
     else
     {
-        date.m_timestamp = -1;
+        date.m_timestamp = Config::INVALID_TIMESTAMP;
     }
 
     return is;

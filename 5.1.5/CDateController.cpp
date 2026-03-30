@@ -1,4 +1,5 @@
 #include "CDateController.h"
+#include "Config.h"
 #include <sstream>
 #include <cctype>
 
@@ -6,14 +7,27 @@ void PrintDateDetails(const CDate& date, std::ostream& output)
 {
     if (!date.IsValid())
     {
-        output << "INVALID" << std::endl;
+        output << Config::RESULT_INVALID << std::endl;
         return;
     }
     
-    output << date << " (Day:" << date.GetDay() 
-           << ", Month:" << static_cast<int>(date.GetMonth())
-           << ", Year:" << date.GetYear()
-           << ", WeekDay:" << static_cast<int>(date.GetWeekDay()) << ")" << std::endl;
+    output << date 
+           << Config::OUTPUT_DAY_PREFIX << date.GetDay() 
+           << Config::OUTPUT_MONTH_PREFIX << static_cast<int>(date.GetMonth())
+           << Config::OUTPUT_YEAR_PREFIX << date.GetYear()
+           << Config::OUTPUT_WEEKDAY_PREFIX << static_cast<int>(date.GetWeekDay()) 
+           << Config::OUTPUT_CLOSE_PAREN;
+}
+
+bool IsNumber(const std::string& str)
+{
+    if (str.empty()) return false;
+    for (char c : str)
+    {
+        if (!std::isdigit(static_cast<unsigned char>(c)))
+            return false;
+    }
+    return true;
 }
 
 void CDateController::ProcessCommands(std::istream& input, std::ostream& output)
@@ -22,191 +36,304 @@ void CDateController::ProcessCommands(std::istream& input, std::ostream& output)
     
     while (input >> firstToken)
     {
-        // Проверяем, не число ли это первым (для формата "3 + 28.02.2010")
-        bool isNumber = true;
-        for (char c : firstToken)
-        {
-            if (!std::isdigit(c))
-            {
-                isNumber = false;
-                break;
-            }
-        }
+        bool isNumber = IsNumber(firstToken);
         
         if (isNumber)
         {
-            // Формат: число + дата
             int n = std::stoi(firstToken);
             std::string op;
             CDate date;
             
-            if (input >> op >> date && op == "+")
+            if (input >> op >> date && op == Config::OPERATOR_PLUS)
             {
-                CDate result = n + date;
-                PrintDateDetails(result, output);
+                if (date.IsValid())
+                {
+                    CDate result = n + date;
+                    PrintDateDetails(result, output);
+                }
+                else
+                {
+                    output << Config::ERROR_INVALID_DATE;
+                    PrintDateDetails(date, output);
+                }
             }
             else
             {
-                output << "INVALID" << std::endl;
+                output << Config::ERROR_INVALID_INPUT_FORMAT;
+                output << Config::RESULT_INVALID << std::endl;
             }
         }
         else
         {
-            // Формат: дата оператор [операнд]
-            // Сначала парсим дату
             std::string dateStr = firstToken;
             
-            // Если дата не полная (например, "01.01" без "2010"), дочитываем
-            int dots = 0;
+            int dots = Config::ZERO;
             for (char c : dateStr)
-                if (c == '.') dots++;
+                if (c == Config::DATE_SEPARATOR) dots++;
             
-            while (dots < 2 && input >> firstToken)
+            while (dots < Config::PAD_TO_2_DIGITS && input >> firstToken)
             {
-                dateStr += " " + firstToken;
+                dateStr += Config::OUTPUT_SPACE + firstToken;
                 for (char c : firstToken)
-                    if (c == '.') dots++;
+                    if (c == Config::DATE_SEPARATOR) dots++;
             }
             
             std::istringstream dateIss(dateStr);
             CDate d1;
             dateIss >> d1;
             
-            // Проверяем, есть ли оператор
-            // Сохраняем позицию, чтобы можно было откатиться
-            std::streampos pos = input.tellg();
-            std::string op;
-            
-            if (!(input >> op))
+            if (!d1.IsValid() && dateStr != Config::RESULT_INVALID)
             {
-                // Нет оператора - выводим дату со всеми геттерами
+                output << Config::ERROR_INVALID_DATE;
                 PrintDateDetails(d1, output);
                 continue;
             }
             
-            // Обработка операторов
-            if (op == "+")
+            std::string op;
+            
+            if (!(input >> op))
+            {
+                PrintDateDetails(d1, output);
+                continue;
+            }
+            
+            if (op == Config::OPERATOR_PLUS)
             {
                 int n;
                 if (input >> n)
                 {
-                    CDate result = d1 + n;
-                    PrintDateDetails(result, output);
+                    if (d1.IsValid())
+                    {
+                        CDate result = d1 + n;
+                        PrintDateDetails(result, output);
+                    }
+                    else
+                    {
+                        output << Config::ERROR_INVALID_DATE;
+                        PrintDateDetails(d1, output);
+                    }
                 }
                 else
-                    output << "INVALID" << std::endl;
+                {
+                    output << Config::ERROR_MISSING_OPERAND;
+                    output << Config::RESULT_INVALID << std::endl;
+                }
             }
-            else if (op == "-")
+            else if (op == Config::OPERATOR_MINUS)
             {
-                // Проверяем, что следующий символ
                 if (input.peek() == EOF)
                 {
-                    output << "INVALID" << std::endl;
+                    output << Config::ERROR_MISSING_OPERAND;
+                    output << Config::RESULT_INVALID << std::endl;
                 }
-                else if (std::isdigit(input.peek()))
+                else if (std::isdigit(static_cast<unsigned char>(input.peek())))
                 {
-                    // Вычитание дней: date - N
                     int n;
                     input >> n;
-                    CDate result = d1 - n;
-                    PrintDateDetails(result, output);
+                    if (d1.IsValid())
+                    {
+                        CDate result = d1 - n;
+                        PrintDateDetails(result, output);
+                    }
+                    else
+                    {
+                        output << Config::ERROR_INVALID_DATE;
+                        PrintDateDetails(d1, output);
+                    }
                 }
                 else
                 {
-                    // Вычитание дат: date - date
                     CDate d2;
                     if (input >> d2)
                     {
-                        int diff = d1 - d2;
-                        output << diff << " days" << std::endl;
+                        if (d1.IsValid() && d2.IsValid())
+                        {
+                            int diff = d1 - d2;
+                            output << diff << Config::RESULT_DAYS_SUFFIX << std::endl;
+                        }
+                        else
+                        {
+                            output << Config::ERROR_INVALID_DATE;
+                            output << Config::RESULT_INVALID << std::endl;
+                        }
                     }
                     else
-                        output << "INVALID" << std::endl;
+                    {
+                        output << Config::ERROR_MISSING_DATE;
+                        output << Config::RESULT_INVALID << std::endl;
+                    }
                 }
             }
-            else if (op == "++")
+            else if (op == Config::OPERATOR_INCREMENT)
             {
-                CDate result = ++d1;
-                PrintDateDetails(result, output);
+                if (d1.IsValid())
+                {
+                    CDate result = ++d1;
+                    PrintDateDetails(result, output);
+                }
+                else
+                {
+                    output << Config::ERROR_INVALID_INCREMENT;
+                    PrintDateDetails(d1, output);
+                }
             }
-            else if (op == "--")
+            else if (op == Config::OPERATOR_DECREMENT)
             {
-                CDate result = --d1;
-                PrintDateDetails(result, output);
+                if (d1.IsValid())
+                {
+                    CDate result = --d1;
+                    PrintDateDetails(result, output);
+                }
+                else
+                {
+                    output << Config::ERROR_INVALID_DECREMENT;
+                    PrintDateDetails(d1, output);
+                }
             }
-            else if (op == "+=")
+            else if (op == Config::OPERATOR_PLUS_EQUAL)
             {
                 int n;
                 if (input >> n)
                 {
-                    d1 += n;
-                    PrintDateDetails(d1, output);
+                    if (d1.IsValid())
+                    {
+                        d1 += n;
+                        PrintDateDetails(d1, output);
+                    }
+                    else
+                    {
+                        output << Config::ERROR_INVALID_DATE;
+                        PrintDateDetails(d1, output);
+                    }
                 }
                 else
-                    output << "INVALID" << std::endl;
+                {
+                    output << Config::ERROR_MISSING_OPERAND;
+                    output << Config::RESULT_INVALID << std::endl;
+                }
             }
-            else if (op == "-=")
+            else if (op == Config::OPERATOR_MINUS_EQUAL)
             {
                 int n;
                 if (input >> n)
                 {
-                    d1 -= n;
-                    PrintDateDetails(d1, output);
+                    if (d1.IsValid())
+                    {
+                        d1 -= n;
+                        PrintDateDetails(d1, output);
+                    }
+                    else
+                    {
+                        output << Config::ERROR_INVALID_DATE;
+                        PrintDateDetails(d1, output);
+                    }
                 }
                 else
-                    output << "INVALID" << std::endl;
+                {
+                    output << Config::ERROR_MISSING_OPERAND;
+                    output << Config::RESULT_INVALID << std::endl;
+                }
             }
-            else if (op == "==")
+            else if (op == Config::OPERATOR_EQUAL)
             {
                 CDate d2;
                 if (input >> d2)
-                    output << (d1 == d2 ? "true" : "false") << std::endl;
+                {
+                    if (d1.IsValid() && d2.IsValid())
+                        output << (d1 == d2 ? Config::RESULT_TRUE : Config::RESULT_FALSE) << std::endl;
+                    else
+                        output << Config::ERROR_INVALID_DATE << Config::RESULT_INVALID << std::endl;
+                }
                 else
-                    output << "INVALID" << std::endl;
+                {
+                    output << Config::ERROR_MISSING_DATE;
+                    output << Config::RESULT_INVALID << std::endl;
+                }
             }
-            else if (op == "!=")
+            else if (op == Config::OPERATOR_NOT_EQUAL)
             {
                 CDate d2;
                 if (input >> d2)
-                    output << (d1 != d2 ? "true" : "false") << std::endl;
+                {
+                    if (d1.IsValid() && d2.IsValid())
+                        output << (d1 != d2 ? Config::RESULT_TRUE : Config::RESULT_FALSE) << std::endl;
+                    else
+                        output << Config::ERROR_INVALID_DATE << Config::RESULT_INVALID << std::endl;
+                }
                 else
-                    output << "INVALID" << std::endl;
+                {
+                    output << Config::ERROR_MISSING_DATE;
+                    output << Config::RESULT_INVALID << std::endl;
+                }
             }
-            else if (op == "<")
+            else if (op == Config::OPERATOR_LESS)
             {
                 CDate d2;
                 if (input >> d2)
-                    output << (d1 < d2 ? "true" : "false") << std::endl;
+                {
+                    if (d1.IsValid() && d2.IsValid())
+                        output << (d1 < d2 ? Config::RESULT_TRUE : Config::RESULT_FALSE) << std::endl;
+                    else
+                        output << Config::ERROR_INVALID_DATE << Config::RESULT_INVALID << std::endl;
+                }
                 else
-                    output << "INVALID" << std::endl;
+                {
+                    output << Config::ERROR_MISSING_DATE;
+                    output << Config::RESULT_INVALID << std::endl;
+                }
             }
-            else if (op == ">")
+            else if (op == Config::OPERATOR_GREATER)
             {
                 CDate d2;
                 if (input >> d2)
-                    output << (d1 > d2 ? "true" : "false") << std::endl;
+                {
+                    if (d1.IsValid() && d2.IsValid())
+                        output << (d1 > d2 ? Config::RESULT_TRUE : Config::RESULT_FALSE) << std::endl;
+                    else
+                        output << Config::ERROR_INVALID_DATE << Config::RESULT_INVALID << std::endl;
+                }
                 else
-                    output << "INVALID" << std::endl;
+                {
+                    output << Config::ERROR_MISSING_DATE;
+                    output << Config::RESULT_INVALID << std::endl;
+                }
             }
-            else if (op == "<=")
+            else if (op == Config::OPERATOR_LESS_EQUAL)
             {
                 CDate d2;
                 if (input >> d2)
-                    output << (d1 <= d2 ? "true" : "false") << std::endl;
+                {
+                    if (d1.IsValid() && d2.IsValid())
+                        output << (d1 <= d2 ? Config::RESULT_TRUE : Config::RESULT_FALSE) << std::endl;
+                    else
+                        output << Config::ERROR_INVALID_DATE << Config::RESULT_INVALID << std::endl;
+                }
                 else
-                    output << "INVALID" << std::endl;
+                {
+                    output << Config::ERROR_MISSING_DATE;
+                    output << Config::RESULT_INVALID << std::endl;
+                }
             }
-            else if (op == ">=")
+            else if (op == Config::OPERATOR_GREATER_EQUAL)
             {
                 CDate d2;
                 if (input >> d2)
-                    output << (d1 >= d2 ? "true" : "false") << std::endl;
+                {
+                    if (d1.IsValid() && d2.IsValid())
+                        output << (d1 >= d2 ? Config::RESULT_TRUE : Config::RESULT_FALSE) << std::endl;
+                    else
+                        output << Config::ERROR_INVALID_DATE << Config::RESULT_INVALID << std::endl;
+                }
                 else
-                    output << "INVALID" << std::endl;
+                {
+                    output << Config::ERROR_MISSING_DATE;
+                    output << Config::RESULT_INVALID << std::endl;
+                }
             }
             else
             {
-                output << "INVALID" << std::endl;
+                output << Config::ERROR_INVALID_OPERATOR;
+                output << Config::RESULT_INVALID << std::endl;
             }
         }
     }
