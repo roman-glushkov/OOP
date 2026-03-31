@@ -5,9 +5,6 @@
 #include <sstream>
 #include <string>
 
-// =====================
-// CDate BASIC TESTS
-// =====================
 TEST_CASE("CDate basic functionality")
 {
     SECTION("Default constructor")
@@ -49,9 +46,6 @@ TEST_CASE("CDate basic functionality")
     }
 }
 
-// =====================
-// GETTERS & WEEKDAY
-// =====================
 TEST_CASE("Getters and weekday")
 {
     SECTION("Leap year date")
@@ -73,9 +67,6 @@ TEST_CASE("Getters and weekday")
     }
 }
 
-// =====================
-// OPERATORS
-// =====================
 TEST_CASE("Operators")
 {
     SECTION("Increment / Decrement")
@@ -145,9 +136,6 @@ TEST_CASE("Operators")
     }
 }
 
-// =====================
-// INTERNAL FUNCTIONS
-// =====================
 TEST_CASE("Internal logic (TestAccess)")
 {
     SECTION("Leap year")
@@ -184,9 +172,6 @@ TEST_CASE("Internal logic (TestAccess)")
     }
 }
 
-// =====================
-// CONTROLLER TESTS
-// =====================
 TEST_CASE("Controller valid scenarios")
 {
     SECTION("Print date")
@@ -222,9 +207,6 @@ TEST_CASE("Controller valid scenarios")
     }
 }
 
-// =====================
-// ERROR TESTS
-// =====================
 TEST_CASE("Controller error handling")
 {
     SECTION("Invalid date format")

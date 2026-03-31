@@ -50,7 +50,6 @@ namespace Config
     const char DATE_SEPARATOR = '.';
     const int PAD_TO_2_DIGITS = 2;
     
-    // 🔴 Ошибки (обновлено)
     const std::string ERROR_INVALID_DATE = "ERROR: Invalid date\n";
     const std::string ERROR_INVALID_INPUT_FORMAT = "ERROR: Invalid input format\n";
     const std::string ERROR_INVALID_OPERATOR = "ERROR: Unknown operator\n";
@@ -58,7 +57,6 @@ namespace Config
     const std::string ERROR_MISSING_DATE = "ERROR: Missing date operand\n";
     const std::string ERROR_INVALID_NUMBER = "ERROR: Invalid number\n";
 
-    // 🟢 Результаты
     const std::string RESULT_INVALID = "INVALID";
     const std::string RESULT_TRUE = "true";
     const std::string RESULT_FALSE = "false";

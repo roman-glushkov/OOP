@@ -3,9 +3,6 @@
 #include <sstream>
 #include <cctype>
 
-// =====================
-// HELPERS
-// =====================
 bool IsNumber(const std::string& str)
 {
     if (str.empty()) return false;
@@ -31,9 +28,6 @@ void PrintDateDetails(const CDate& date, std::ostream& output)
            << Config::OUTPUT_CLOSE_PAREN;
 }
 
-// =====================
-// NUMBER FIRST (n + date)
-// =====================
 void HandleNumberFirst(int n, std::istream& input, std::ostream& output)
 {
     std::string op;
@@ -43,7 +37,6 @@ void HandleNumberFirst(int n, std::istream& input, std::ostream& output)
         return;
     }
 
-    // ❗ СНАЧАЛА проверка оператора
     if (op != Config::OPERATOR_PLUS)
     {
         output << Config::ERROR_INVALID_OPERATOR;
@@ -66,9 +59,6 @@ void HandleNumberFirst(int n, std::istream& input, std::ostream& output)
     PrintDateDetails(n + date, output);
 }
 
-// =====================
-// DATE FIRST
-// =====================
 void HandleDateFirst(const std::string& token, std::istream& input, std::ostream& output)
 {
     std::istringstream iss(token);
@@ -88,9 +78,6 @@ void HandleDateFirst(const std::string& token, std::istream& input, std::ostream
         return;
     }
 
-    // =====================
-    // ++ / --
-    // =====================
     if (op == Config::OPERATOR_INCREMENT)
     {
         PrintDateDetails(++d1, output);
@@ -103,9 +90,6 @@ void HandleDateFirst(const std::string& token, std::istream& input, std::ostream
         return;
     }
 
-    // =====================
-    // UNKNOWN OPERATOR CHECK (раньше!)
-    // =====================
     if (op != Config::OPERATOR_PLUS &&
         op != Config::OPERATOR_MINUS &&
         op != Config::OPERATOR_PLUS_EQUAL &&
@@ -121,9 +105,6 @@ void HandleDateFirst(const std::string& token, std::istream& input, std::ostream
         return;
     }
 
-    // =====================
-    // TRY READ SECOND TOKEN
-    // =====================
     std::string nextToken;
     if (!(input >> nextToken))
     {
@@ -131,9 +112,6 @@ void HandleDateFirst(const std::string& token, std::istream& input, std::ostream
         return;
     }
 
-    // =====================
-    // NUMBER OPERATIONS
-    // =====================
     if (IsNumber(nextToken))
     {
         int n = std::stoi(nextToken);
@@ -160,9 +138,6 @@ void HandleDateFirst(const std::string& token, std::istream& input, std::ostream
         return;
     }
 
-    // =====================
-    // SECOND DATE
-    // =====================
     CDate d2;
     std::istringstream iss2(nextToken);
     iss2 >> d2;
@@ -173,9 +148,6 @@ void HandleDateFirst(const std::string& token, std::istream& input, std::ostream
         return;
     }
 
-    // =====================
-    // DATE OPERATIONS
-    // =====================
     if (op == Config::OPERATOR_MINUS)
     {
         output << (d1 - d2) << Config::RESULT_DAYS_SUFFIX << std::endl;
@@ -196,9 +168,6 @@ void HandleDateFirst(const std::string& token, std::istream& input, std::ostream
         output << Config::ERROR_INVALID_OPERATOR;
 }
 
-// =====================
-// MAIN
-// =====================
 void CDateController::ProcessCommands(std::istream& input, std::ostream& output)
 {
     std::string token;
