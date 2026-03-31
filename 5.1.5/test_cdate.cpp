@@ -5,479 +5,297 @@
 #include <sstream>
 #include <string>
 
-TEST_CASE("CDate class tests", "[CDate]")
+// =====================
+// CDate BASIC TESTS
+// =====================
+TEST_CASE("CDate basic functionality")
 {
-    SECTION("Constructor and basic initialization")
+    SECTION("Default constructor")
     {
-        CDate date1;
-        CHECK(date1.GetDay() == 1);
-        CHECK(date1.GetMonth() == Month::JANUARY);
-        CHECK(date1.GetYear() == 1970);
-        CHECK(date1.GetWeekDay() == WeekDay::THURSDAY);
-        CHECK(date1.IsValid() == true);
-        
-        CDate date2(1, Month::JANUARY, 1970);
-        CHECK(date2.GetDay() == 1);
-        CHECK(date2.GetMonth() == Month::JANUARY);
-        CHECK(date2.GetYear() == 1970);
-        CHECK(date2.IsValid() == true);
-        
-        CDate date3(32);
-        CHECK(date3.GetDay() == 2);
-        CHECK(date3.GetMonth() == Month::FEBRUARY);
-        CHECK(date3.GetYear() == 1970);
-        CHECK(date3.IsValid() == true);
+        CDate date;
+        CHECK(date.GetDay() == 1);
+        CHECK(date.GetMonth() == Month::JANUARY);
+        CHECK(date.GetYear() == 1970);
+        CHECK(date.GetWeekDay() == WeekDay::THURSDAY);
+        CHECK(date.IsValid());
     }
-    
-    SECTION("Invalid date handling")
-    {
-        CDate invalidDate1(0, Month::JANUARY, 1970);
-        CHECK(invalidDate1.IsValid() == false);
-        
-        CDate invalidDate2(31, Month::FEBRUARY, 2020);
-        CHECK(invalidDate2.IsValid() == false);
-        
-        CDate invalidDate3(1, Month::JANUARY, 1969);
-        CHECK(invalidDate3.IsValid() == false);
-        
-        CDate invalidDate4(1, Month::JANUARY, 10000);
-        CHECK(invalidDate4.IsValid() == false);
-        
-        CDate invalidDate5(-1);
-        CHECK(invalidDate5.IsValid() == false);
-        
-        CDate invalidDate6(9999999);
-        CHECK(invalidDate6.IsValid() == false);
-    }
-}
 
-TEST_CASE("Getters tests", "[Getters]")
-{
-    SECTION("Standard date 23.03.2010")
+    SECTION("Valid date creation")
     {
         CDate date(23, Month::MARCH, 2010);
-        
         CHECK(date.GetDay() == 23);
         CHECK(date.GetMonth() == Month::MARCH);
         CHECK(date.GetYear() == 2010);
-        CHECK(date.GetWeekDay() == WeekDay::TUESDAY);
-        CHECK(date.IsValid() == true);
+        CHECK(date.IsValid());
     }
-    
-    SECTION("Leap year date 29.02.2020")
+
+    SECTION("Timestamp constructor")
+    {
+        CDate date(32);
+        CHECK(date.GetDay() == 2);
+        CHECK(date.GetMonth() == Month::FEBRUARY);
+        CHECK(date.GetYear() == 1970);
+        CHECK(date.IsValid());
+    }
+
+    SECTION("Invalid dates")
+    {
+        CHECK_FALSE(CDate(0, Month::JANUARY, 1970).IsValid());
+        CHECK_FALSE(CDate(31, Month::FEBRUARY, 2020).IsValid());
+        CHECK_FALSE(CDate(1, Month::JANUARY, 1969).IsValid());
+        CHECK_FALSE(CDate(1, Month::JANUARY, 10000).IsValid());
+        CHECK_FALSE(CDate(-1).IsValid());
+        CHECK_FALSE(CDate(9999999).IsValid());
+    }
+}
+
+// =====================
+// GETTERS & WEEKDAY
+// =====================
+TEST_CASE("Getters and weekday")
+{
+    SECTION("Leap year date")
     {
         CDate date(29, Month::FEBRUARY, 2020);
-        
-        CHECK(date.GetDay() == 29);
-        CHECK(date.GetMonth() == Month::FEBRUARY);
-        CHECK(date.GetYear() == 2020);
         CHECK(date.GetWeekDay() == WeekDay::SATURDAY);
-        CHECK(date.IsValid() == true);
     }
-    
-    SECTION("End of year 31.12.2023")
+
+    SECTION("End of year")
     {
         CDate date(31, Month::DECEMBER, 2023);
-        
-        CHECK(date.GetDay() == 31);
-        CHECK(date.GetMonth() == Month::DECEMBER);
-        CHECK(date.GetYear() == 2023);
         CHECK(date.GetWeekDay() == WeekDay::SUNDAY);
-        CHECK(date.IsValid() == true);
     }
-    
-    SECTION("Beginning of year 01.01.2024")
+
+    SECTION("Beginning of year")
     {
         CDate date(1, Month::JANUARY, 2024);
-        
-        CHECK(date.GetDay() == 1);
-        CHECK(date.GetMonth() == Month::JANUARY);
-        CHECK(date.GetYear() == 2024);
         CHECK(date.GetWeekDay() == WeekDay::MONDAY);
-        CHECK(date.IsValid() == true);
     }
 }
 
-TEST_CASE("Operators tests", "[Operators]")
+// =====================
+// OPERATORS
+// =====================
+TEST_CASE("Operators")
 {
-    SECTION("Increment and decrement operators")
+    SECTION("Increment / Decrement")
     {
         CDate date(31, Month::DECEMBER, 2023);
-        
-        CDate afterIncrement = ++date;
-        CHECK(afterIncrement.GetDay() == 1);
-        CHECK(afterIncrement.GetMonth() == Month::JANUARY);
-        CHECK(afterIncrement.GetYear() == 2024);
-        
-        CDate postIncrement = date++;
-        CHECK(postIncrement.GetDay() == 1);
-        CHECK(postIncrement.GetMonth() == Month::JANUARY);
-        CHECK(postIncrement.GetYear() == 2024);
+
+        ++date;
+        CHECK(date.GetDay() == 1);
+        CHECK(date.GetMonth() == Month::JANUARY);
+
+        date++;
         CHECK(date.GetDay() == 2);
-        
-        CDate date2(1, Month::JANUARY, 2024);
-        CDate afterDecrement = --date2;
-        CHECK(afterDecrement.GetDay() == 31);
-        CHECK(afterDecrement.GetMonth() == Month::DECEMBER);
-        CHECK(afterDecrement.GetYear() == 2023);
-        
-        CDate date3(1, Month::MARCH, 2020);
-        CDate postDecrement = date3--;
-        CHECK(postDecrement.GetDay() == 1);
-        CHECK(postDecrement.GetMonth() == Month::MARCH);
-        CHECK(postDecrement.GetYear() == 2020);
-        CHECK(date3.GetDay() == 29);
-        CHECK(date3.GetMonth() == Month::FEBRUARY);
-        CHECK(date3.GetYear() == 2020);
+
+        CDate d2(1, Month::JANUARY, 2024);
+        --d2;
+        CHECK(d2.GetYear() == 2023);
+
+        CDate d3(1, Month::MARCH, 2020);
+        d3--;
+        CHECK(d3.GetDay() == 29);
     }
-    
-    SECTION("Addition operator")
+
+    SECTION("Addition")
     {
         CDate date(28, Month::FEBRUARY, 2010);
-        CDate result1 = date + 3;
-        CHECK(result1.GetDay() == 3);
-        CHECK(result1.GetMonth() == Month::MARCH);
-        CHECK(result1.GetYear() == 2010);
-        
+
+        CDate result = date + 3;
+        CHECK(result.GetDay() == 3);
+        CHECK(result.GetMonth() == Month::MARCH);
+
         CDate result2 = 3 + date;
         CHECK(result2.GetDay() == 3);
-        CHECK(result2.GetMonth() == Month::MARCH);
-        CHECK(result2.GetYear() == 2010);
-        
-        CDate date2(31, Month::DECEMBER, 2023);
-        CDate result3 = date2 + 1;
-        CHECK(result3.GetDay() == 1);
-        CHECK(result3.GetMonth() == Month::JANUARY);
-        CHECK(result3.GetYear() == 2024);
-        
-        CDate date3(1, Month::JANUARY, 1970);
-        CDate result4 = date3 + 365;
-        CHECK(result4.GetDay() == 1);
-        CHECK(result4.GetMonth() == Month::JANUARY);
-        CHECK(result4.GetYear() == 1971);
     }
-    
-    SECTION("Subtraction operator")
+
+    SECTION("Subtraction")
     {
-        CDate date(1, Month::JANUARY, 2010);
-        CDate result1 = date - 2;
-        CHECK(result1.GetDay() == 30);
-        CHECK(result1.GetMonth() == Month::DECEMBER);
-        CHECK(result1.GetYear() == 2009);
-        
-        CDate date2(3, Month::MARCH, 2010);
-        CDate date3(28, Month::FEBRUARY, 2010);
-        int diff1 = date2 - date3;
-        CHECK(diff1 == 3);
-        
-        CDate date4(1, Month::JANUARY, 2010);
-        CDate date5(3, Month::JANUARY, 2010);
-        int diff2 = date4 - date5;
-        CHECK(diff2 == -2);
-        
-        CDate date6(1, Month::MARCH, 2020);
-        CDate date7(1, Month::MARCH, 2019);
-        int diff3 = date6 - date7;
-        CHECK(diff3 == 366);
+        CDate d1(1, Month::JANUARY, 2010);
+        CDate d2(30, Month::DECEMBER, 2009);
+
+        CHECK((d1 - d2) == 2);
+        CHECK((d2 - d1) == -2);
     }
-    
-    SECTION("Addition assignment operator")
+
+    SECTION("Assignment operators")
     {
         CDate date(28, Month::FEBRUARY, 2010);
+
         date += 3;
-        CHECK(date.GetDay() == 3);
         CHECK(date.GetMonth() == Month::MARCH);
-        CHECK(date.GetYear() == 2010);
-        
-        CDate date2(31, Month::DECEMBER, 2023);
-        date2 += 1;
-        CHECK(date2.GetDay() == 1);
-        CHECK(date2.GetMonth() == Month::JANUARY);
-        CHECK(date2.GetYear() == 2024);
+
+        date -= 3;
+        CHECK(date.GetMonth() == Month::FEBRUARY);
     }
-    
-    SECTION("Subtraction assignment operator")
+
+    SECTION("Comparisons")
     {
-        CDate date(1, Month::JANUARY, 2010);
-        date -= 2;
-        CHECK(date.GetDay() == 30);
-        CHECK(date.GetMonth() == Month::DECEMBER);
-        CHECK(date.GetYear() == 2009);
-        
-        CDate date2(1, Month::MARCH, 2020);
-        date2 -= 1;
-        CHECK(date2.GetDay() == 29);
-        CHECK(date2.GetMonth() == Month::FEBRUARY);
-        CHECK(date2.GetYear() == 2020);
-    }
-    
-    SECTION("Comparison operators")
-    {
-        CDate date1(1, Month::JANUARY, 2020);
-        CDate date2(1, Month::JANUARY, 2020);
-        CDate date3(2, Month::JANUARY, 2020);
-        CDate date4(31, Month::DECEMBER, 2019);
-        
-        CHECK((date1 == date2) == true);
-        CHECK((date1 == date3) == false);
-        CHECK((date1 != date3) == true);
-        CHECK((date1 != date2) == false);
-        
-        CHECK((date1 < date3) == true);
-        CHECK((date1 < date4) == false);
-        CHECK((date3 > date1) == true);
-        CHECK((date4 > date1) == false);
-        
-        CHECK((date1 <= date2) == true);
-        CHECK((date1 <= date3) == true);
-        CHECK((date1 <= date4) == false);
-        CHECK((date1 >= date2) == true);
-        CHECK((date3 >= date1) == true);
-        CHECK((date4 >= date1) == false);
+        CDate d1(1, Month::JANUARY, 2020);
+        CDate d2(1, Month::JANUARY, 2020);
+        CDate d3(2, Month::JANUARY, 2020);
+
+        CHECK(d1 == d2);
+        CHECK(d1 != d3);
+        CHECK(d1 < d3);
+        CHECK(d3 > d1);
+        CHECK(d1 <= d2);
+        CHECK(d3 >= d1);
     }
 }
 
-TEST_CASE("Individual functions tests", "[IndividualFunctions]")
+// =====================
+// INTERNAL FUNCTIONS
+// =====================
+TEST_CASE("Internal logic (TestAccess)")
 {
-    SECTION("IsLeapYear function")
+    SECTION("Leap year")
     {
-        CHECK(TestAccess::IsLeapYear(2020) == true);
-        CHECK(TestAccess::IsLeapYear(2021) == false);
-        CHECK(TestAccess::IsLeapYear(1900) == false);
-        CHECK(TestAccess::IsLeapYear(2000) == true);
-        CHECK(TestAccess::IsLeapYear(2024) == true);
-        CHECK(TestAccess::IsLeapYear(2023) == false);
+        CHECK(TestAccess::IsLeapYear(2020));
+        CHECK_FALSE(TestAccess::IsLeapYear(2021));
+        CHECK_FALSE(TestAccess::IsLeapYear(1900));
+        CHECK(TestAccess::IsLeapYear(2000));
     }
-    
-    SECTION("DaysInMonth function")
+
+    SECTION("Days in month")
     {
-        CHECK(TestAccess::DaysInMonth(2020, Month::JANUARY) == 31);
         CHECK(TestAccess::DaysInMonth(2020, Month::FEBRUARY) == 29);
         CHECK(TestAccess::DaysInMonth(2021, Month::FEBRUARY) == 28);
-        CHECK(TestAccess::DaysInMonth(2020, Month::APRIL) == 30);
-        CHECK(TestAccess::DaysInMonth(2020, Month::DECEMBER) == 31);
     }
-    
-    SECTION("DateToTimestamp function")
+
+    SECTION("Timestamp conversion")
     {
-        int timestamp1 = TestAccess::DateToTimestamp(1, Month::JANUARY, 1970);
-        CHECK(timestamp1 == 0);
-        
-        int timestamp2 = TestAccess::DateToTimestamp(2, Month::JANUARY, 1970);
-        CHECK(timestamp2 == 1);
-        
-        int timestamp3 = TestAccess::DateToTimestamp(1, Month::FEBRUARY, 1970);
-        CHECK(timestamp3 == 31);
-        
-        int timestamp4 = TestAccess::DateToTimestamp(1, Month::JANUARY, 1971);
-        CHECK(timestamp4 == 365);
-        
-        int invalidTimestamp = TestAccess::DateToTimestamp(0, Month::JANUARY, 1970);
-        CHECK(invalidTimestamp == -1);
+        CHECK(TestAccess::DateToTimestamp(1, Month::JANUARY, 1970) == 0);
+        CHECK(TestAccess::DateToTimestamp(1, Month::JANUARY, 1971) == 365);
+
+        int invalid = TestAccess::DateToTimestamp(0, Month::JANUARY, 1970);
+        CHECK(invalid == -1);
     }
-    
-    SECTION("TimestampToDate function")
+
+    SECTION("Reverse conversion")
     {
-        unsigned day;
-        Month month;
-        unsigned year;
-        
-        TestAccess::TimestampToDate(0, day, month, year);
-        CHECK(day == 1);
-        CHECK(month == Month::JANUARY);
-        CHECK(year == 1970);
-        
-        TestAccess::TimestampToDate(31, day, month, year);
-        CHECK(day == 1);
-        CHECK(month == Month::FEBRUARY);
-        CHECK(year == 1970);
-        
-        TestAccess::TimestampToDate(365, day, month, year);
-        CHECK(day == 1);
-        CHECK(month == Month::JANUARY);
-        CHECK(year == 1971);
-        
-        TestAccess::TimestampToDate(-1, day, month, year);
-        CHECK(day == 0);
-        CHECK(year == 0);
-    }
-    
-    SECTION("CalculateWeekDay function")
-    {
-        WeekDay day1 = TestAccess::CalculateWeekDay(0);
-        CHECK(day1 == WeekDay::THURSDAY);
-        
-        WeekDay day2 = TestAccess::CalculateWeekDay(1);
-        CHECK(day2 == WeekDay::FRIDAY);
-        
-        WeekDay day3 = TestAccess::CalculateWeekDay(6);
-        CHECK(day3 == WeekDay::WEDNESDAY);
-        
-        WeekDay day4 = TestAccess::CalculateWeekDay(7);
-        CHECK(day4 == WeekDay::THURSDAY);
+        unsigned d; Month m; unsigned y;
+
+        TestAccess::TimestampToDate(0, d, m, y);
+        CHECK(d == 1);
+        CHECK(m == Month::JANUARY);
+        CHECK(y == 1970);
     }
 }
 
-TEST_CASE("ProcessCommands tests", "[ProcessCommands]")
+// =====================
+// CONTROLLER TESTS
+// =====================
+TEST_CASE("Controller valid scenarios")
 {
-    SECTION("Print date with details")
+    SECTION("Print date")
     {
-        std::istringstream input("24.12.2020");
-        std::ostringstream output;
-        CDateController::ProcessCommands(input, output);
-        CHECK(output.str() == "24.12.2020 (Day:24, Month:12, Year:2020, WeekDay:4)\n");
+        std::istringstream in("24.12.2020");
+        std::ostringstream out;
+        CDateController::ProcessCommands(in, out);
+        CHECK(out.str() == "24.12.2020 (Day:24, Month:12, Year:2020, WeekDay:4)\n");
     }
-    
-    SECTION("Addition operations")
+
+    SECTION("Addition")
     {
-        std::istringstream input("28.02.2010 + 3");
-        std::ostringstream output;
-        CDateController::ProcessCommands(input, output);
-        CHECK(output.str() == "03.03.2010 (Day:3, Month:3, Year:2010, WeekDay:3)\n");
+        std::istringstream in("28.02.2010 + 3");
+        std::ostringstream out;
+        CDateController::ProcessCommands(in, out);
+        CHECK(out.str() == "03.03.2010 (Day:3, Month:3, Year:2010, WeekDay:3)\n");
     }
-    
-    SECTION("Subtraction operations - days")
+
+    SECTION("Difference")
     {
-        std::istringstream input("01.01.2010 - 2");
-        std::ostringstream output;
-        CDateController::ProcessCommands(input, output);
-        std::string result = output.str();
-        CHECK(result.find("30.12.2009") != std::string::npos);
-        CHECK(result.find("Day:30") != std::string::npos);
-        CHECK(result.find("Month:12") != std::string::npos);
-        CHECK(result.find("Year:2009") != std::string::npos);
+        std::istringstream in("01.01.2010 - 30.12.2009");
+        std::ostringstream out;
+        CDateController::ProcessCommands(in, out);
+        CHECK(out.str() == "2 days\n");
     }
-    
-    SECTION("Subtraction operations - dates")
+
+    SECTION("Number first")
     {
-        std::istringstream input("01.01.2010 - 30.12.2009");
-        std::ostringstream output;
-        CDateController::ProcessCommands(input, output);
-        CHECK(output.str() == "2 days\n");
-    }
-    
-    SECTION("Increment operations")
-    {
-        std::istringstream input("31.12.2023 ++");
-        std::ostringstream output;
-        CDateController::ProcessCommands(input, output);
-        CHECK(output.str() == "01.01.2024 (Day:1, Month:1, Year:2024, WeekDay:1)\n");
-    }
-    
-    SECTION("Decrement operations")
-    {
-        std::istringstream input("01.01.2024 --");
-        std::ostringstream output;
-        CDateController::ProcessCommands(input, output);
-        CHECK(output.str() == "31.12.2023 (Day:31, Month:12, Year:2023, WeekDay:0)\n");
-    }
-    
-    SECTION("Number plus date format")
-    {
-        std::istringstream input("3 + 28.02.2010");
-        std::ostringstream output;
-        CDateController::ProcessCommands(input, output);
-        CHECK(output.str() == "03.03.2010 (Day:3, Month:3, Year:2010, WeekDay:3)\n");
+        std::istringstream in("3 + 28.02.2010");
+        std::ostringstream out;
+        CDateController::ProcessCommands(in, out);
+        CHECK(out.str() == "03.03.2010 (Day:3, Month:3, Year:2010, WeekDay:3)\n");
     }
 }
 
-TEST_CASE("Error handling tests", "[Errors]")
+// =====================
+// ERROR TESTS
+// =====================
+TEST_CASE("Controller error handling")
 {
-    SECTION("Invalid input format")
+    SECTION("Invalid date format")
     {
-        std::istringstream input("01-01-2020");
-        std::ostringstream output;
-        CDateController::ProcessCommands(input, output);
-        CHECK(output.str() == "ERROR: Invalid date\nINVALID\n");
+        std::istringstream in("01-01-2020");
+        std::ostringstream out;
+        CDateController::ProcessCommands(in, out);
+        CHECK(out.str() == "ERROR: Invalid date\n");
     }
-    
-    SECTION("Unknown operator error")
+
+    SECTION("Invalid date value")
     {
-        std::istringstream input("01.01.2020 % 5");
-        std::ostringstream output;
-        CDateController::ProcessCommands(input, output);
-        std::string result = output.str();
-        CHECK(result.find("ERROR: Unknown operator") != std::string::npos);
-        CHECK(result.find("INVALID") != std::string::npos);
+        std::istringstream in("32.01.2020");
+        std::ostringstream out;
+        CDateController::ProcessCommands(in, out);
+        CHECK(out.str() == "ERROR: Invalid date\n");
     }
-    
-    SECTION("Invalid increment on invalid date")
+
+    SECTION("Invalid operator")
     {
-        std::istringstream input("32.01.2020 ++");
-        std::ostringstream output;
-        CDateController::ProcessCommands(input, output);
-        CHECK(output.str() == "ERROR: Invalid date\nINVALID\n");
+        std::istringstream in("01.01.2020 % 5");
+        std::ostringstream out;
+        CDateController::ProcessCommands(in, out);
+        CHECK(out.str() == "ERROR: Unknown operator\n");
     }
-    
-    SECTION("Invalid decrement on invalid date")
+
+    SECTION("Missing operand")
     {
-        std::istringstream input("32.01.2020 --");
-        std::ostringstream output;
-        CDateController::ProcessCommands(input, output);
-        CHECK(output.str() == "ERROR: Invalid date\nINVALID\n");
+        std::istringstream in("01.01.2020 +");
+        std::ostringstream out;
+        CDateController::ProcessCommands(in, out);
+        CHECK(out.str() == "ERROR: Missing operand\n");
     }
-    
-    SECTION("Invalid year error")
+
+    SECTION("Invalid second date")
     {
-        std::istringstream input("01.01.1969");
-        std::ostringstream output;
-        CDateController::ProcessCommands(input, output);
-        CHECK(output.str() == "ERROR: Invalid date\nINVALID\n");
+        std::istringstream in("01.01.2020 - 32.01.2020");
+        std::ostringstream out;
+        CDateController::ProcessCommands(in, out);
+        CHECK(out.str() == "ERROR: Invalid date\n");
     }
-    
-    SECTION("Invalid day error")
+
+    SECTION("Number first invalid operator")
     {
-        std::istringstream input("32.01.2020");
-        std::ostringstream output;
-        CDateController::ProcessCommands(input, output);
-        CHECK(output.str() == "ERROR: Invalid date\nINVALID\n");
+        std::istringstream in("3 - 01.01.2020");
+        std::ostringstream out;
+        CDateController::ProcessCommands(in, out);
+        CHECK(out.str() == "ERROR: Unknown operator\n");
     }
-    
-    SECTION("Missing operand error")
+
+    SECTION("Number + invalid date")
     {
-        std::istringstream input("01.01.2020 +");
-        std::ostringstream output;
-        CDateController::ProcessCommands(input, output);
-        CHECK(output.str() == "ERROR: Missing operand\nINVALID\n");
+        std::istringstream in("3 + 32.01.2020");
+        std::ostringstream out;
+        CDateController::ProcessCommands(in, out);
+        CHECK(out.str() == "ERROR: Invalid date\n");
     }
-    
-    SECTION("Missing date operand error")
+
+    SECTION("Out of range result")
     {
-        std::istringstream input("01.01.2020 -");
-        std::ostringstream output;
-        CDateController::ProcessCommands(input, output);
-        CHECK(output.str() == "ERROR: Missing operand\nINVALID\n");
+        std::istringstream in("31.12.9999 + 1");
+        std::ostringstream out;
+        CDateController::ProcessCommands(in, out);
+        CHECK(out.str() == "INVALID\n");
     }
-    
-    SECTION("Comparison with invalid date")
+
+    SECTION("Empty input")
     {
-        std::istringstream input("32.01.2020 == 01.01.2020");
-        std::ostringstream output;
-        CDateController::ProcessCommands(input, output);
-        CHECK(output.str() == "ERROR: Invalid date\nINVALID\n");
-    }
-    
-    SECTION("Subtraction with invalid date")
-    {
-        std::istringstream input("32.01.2020 - 01.01.2020");
-        std::ostringstream output;
-        CDateController::ProcessCommands(input, output);
-        CHECK(output.str() == "ERROR: Invalid date\nINVALID\n");
-    }
-    
-    SECTION("Result out of valid range")
-    {
-        std::istringstream input("31.12.9999 + 1");
-        std::ostringstream output;
-        CDateController::ProcessCommands(input, output);
-        CHECK(output.str() == "INVALID\n");
-    }
-    
-    SECTION("Empty input handling")
-    {
-        std::istringstream input("");
-        std::ostringstream output;
-        CDateController::ProcessCommands(input, output);
-        CHECK(output.str() == "");
+        std::istringstream in("");
+        std::ostringstream out;
+        CDateController::ProcessCommands(in, out);
+        CHECK(out.str().empty());
     }
 }

@@ -33,15 +33,13 @@ namespace Config
     const int WEEKDAY_MIN = 0;
     
     const int FIRST_MONTH = 1;
-    const int LAST_MONTH = 12;
     
-    const unsigned MIN_DAY = 1;
     const unsigned ZERO_DAY = 0;
+    const unsigned INVALID_DAY = 0;
+    const unsigned INVALID_YEAR = 0;
     const int DAY_OFFSET = 1;
     const int TIMESTAMP_TO_DAY_OFFSET = 1;
     
-    const unsigned INVALID_YEAR = 0;
-    const unsigned INVALID_DAY = 0;
     const int ZERO = 0;
     
     const int SINGLE_DIGIT = 10;
@@ -51,23 +49,16 @@ namespace Config
     const char ZERO_FILL = '0';
     const char DATE_SEPARATOR = '.';
     const int PAD_TO_2_DIGITS = 2;
-    const int PAD_TO_4_DIGITS = 4;
     
-    const std::string ERROR_INVALID_YEAR = "ERROR: Year must be between 1970 and 9999\n";
-    const std::string ERROR_INVALID_DAY = "ERROR: Day is out of range for the specified month\n";
+    // 🔴 Ошибки (обновлено)
     const std::string ERROR_INVALID_DATE = "ERROR: Invalid date\n";
-    const std::string ERROR_INVALID_TIMESTAMP = "ERROR: Timestamp is negative\n";
-    const std::string ERROR_INVALID_INPUT_FORMAT = "ERROR: Invalid input format. Expected DD.MM.YYYY\n";
+    const std::string ERROR_INVALID_INPUT_FORMAT = "ERROR: Invalid input format\n";
     const std::string ERROR_INVALID_OPERATOR = "ERROR: Unknown operator\n";
     const std::string ERROR_MISSING_OPERAND = "ERROR: Missing operand\n";
-    const std::string ERROR_INVALID_OPERAND = "ERROR: Invalid operand\n";
-    const std::string ERROR_DATE_OUT_OF_RANGE = "ERROR: Resulting date is out of valid range\n";
-    const std::string ERROR_EMPTY_INPUT = "ERROR: Empty input\n";
-    const std::string ERROR_INVALID_NUMBER_FORMAT = "ERROR: Invalid number format\n";
     const std::string ERROR_MISSING_DATE = "ERROR: Missing date operand\n";
-    const std::string ERROR_INVALID_INCREMENT = "ERROR: Cannot increment invalid date\n";
-    const std::string ERROR_INVALID_DECREMENT = "ERROR: Cannot decrement invalid date\n";
-    
+    const std::string ERROR_INVALID_NUMBER = "ERROR: Invalid number\n";
+
+    // 🟢 Результаты
     const std::string RESULT_INVALID = "INVALID";
     const std::string RESULT_TRUE = "true";
     const std::string RESULT_FALSE = "false";
