@@ -3,9 +3,8 @@
 
 bool CDate::IsLeapYear(unsigned year)
 {
-    return (year % Config::LEAP_YEAR_DIVISOR_4 == Config::ZERO && 
-            year % Config::LEAP_YEAR_DIVISOR_100 != Config::ZERO) || 
-           (year % Config::LEAP_YEAR_DIVISOR_400 == Config::ZERO);
+    return (year % Config::LEAP_YEAR_DIVISOR_4 == Config::ZERO && year % Config::LEAP_YEAR_DIVISOR_100 != Config::ZERO) || 
+    (year % Config::LEAP_YEAR_DIVISOR_400 == Config::ZERO);
 }
 
 unsigned CDate::DaysInMonth(unsigned year, Month month)
@@ -96,7 +95,7 @@ void CDate::TimestampToDate(int timestamp, unsigned& day, Month& month, unsigned
 WeekDay CDate::CalculateWeekDay(int timestamp)
 {
     int d = (Config::EPOCH_WEEKDAY + timestamp) % Config::DAYS_IN_WEEK;
-    if (d < Config::WEEKDAY_MIN) 
+    if (d < Config::WEEKDAY_MIN)
         d += Config::DAYS_IN_WEEK;
     return static_cast<WeekDay>(d);
 }

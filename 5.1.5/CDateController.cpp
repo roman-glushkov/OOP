@@ -6,9 +6,11 @@
 bool IsNumber(const std::string& str)
 {
     if (str.empty()) return false;
+    
     for (char c : str)
         if (!std::isdigit(static_cast<unsigned char>(c)))
             return false;
+    
     return true;
 }
 
@@ -20,17 +22,18 @@ void PrintDateDetails(const CDate& date, std::ostream& output)
         return;
     }
 
-    output << date
-           << Config::OUTPUT_DAY_PREFIX << date.GetDay()
-           << Config::OUTPUT_MONTH_PREFIX << static_cast<int>(date.GetMonth())
-           << Config::OUTPUT_YEAR_PREFIX << date.GetYear()
-           << Config::OUTPUT_WEEKDAY_PREFIX << static_cast<int>(date.GetWeekDay())
-           << Config::OUTPUT_CLOSE_PAREN;
+    output << date    
+           << Config::OUTPUT_DAY_PREFIX << date.GetDay()     
+           << Config::OUTPUT_MONTH_PREFIX << static_cast<int>(date.GetMonth()) 
+           << Config::OUTPUT_YEAR_PREFIX << date.GetYear()   
+           << Config::OUTPUT_WEEKDAY_PREFIX << static_cast<int>(date.GetWeekDay()) 
+           << Config::OUTPUT_CLOSE_PAREN;                   
 }
 
 void HandleNumberFirst(int n, std::istream& input, std::ostream& output)
 {
     std::string op;
+    
     if (!(input >> op))
     {
         output << Config::ERROR_MISSING_OPERAND;
@@ -64,7 +67,7 @@ void HandleDateFirst(const std::string& token, std::istream& input, std::ostream
     std::istringstream iss(token);
     CDate d1;
     iss >> d1;
-
+    
     if (!d1.IsValid())
     {
         output << Config::ERROR_INVALID_DATE;
@@ -83,23 +86,23 @@ void HandleDateFirst(const std::string& token, std::istream& input, std::ostream
         PrintDateDetails(++d1, output);
         return;
     }
-
+    
     if (op == Config::OPERATOR_DECREMENT)
     {
         PrintDateDetails(--d1, output);
         return;
     }
 
-    if (op != Config::OPERATOR_PLUS &&
-        op != Config::OPERATOR_MINUS &&
-        op != Config::OPERATOR_PLUS_EQUAL &&
-        op != Config::OPERATOR_MINUS_EQUAL &&
-        op != Config::OPERATOR_EQUAL &&
-        op != Config::OPERATOR_NOT_EQUAL &&
-        op != Config::OPERATOR_LESS &&
-        op != Config::OPERATOR_GREATER &&
-        op != Config::OPERATOR_LESS_EQUAL &&
-        op != Config::OPERATOR_GREATER_EQUAL)
+    if (op != Config::OPERATOR_PLUS &&                
+        op != Config::OPERATOR_MINUS &&                
+        op != Config::OPERATOR_PLUS_EQUAL &&          
+        op != Config::OPERATOR_MINUS_EQUAL &&          
+        op != Config::OPERATOR_EQUAL &&                
+        op != Config::OPERATOR_NOT_EQUAL &&           
+        op != Config::OPERATOR_LESS &&                
+        op != Config::OPERATOR_GREATER &&              
+        op != Config::OPERATOR_LESS_EQUAL &&           
+        op != Config::OPERATOR_GREATER_EQUAL)          
     {
         output << Config::ERROR_INVALID_OPERATOR;
         return;
@@ -115,7 +118,7 @@ void HandleDateFirst(const std::string& token, std::istream& input, std::ostream
     if (IsNumber(nextToken))
     {
         int n = std::stoi(nextToken);
-
+        
         if (op == Config::OPERATOR_PLUS)
             PrintDateDetails(d1 + n, output);
         else if (op == Config::OPERATOR_MINUS)
@@ -134,14 +137,13 @@ void HandleDateFirst(const std::string& token, std::istream& input, std::ostream
         {
             output << Config::ERROR_INVALID_OPERATOR;
         }
-
         return;
     }
-
+    
     CDate d2;
     std::istringstream iss2(nextToken);
     iss2 >> d2;
-
+    
     if (!d2.IsValid())
     {
         output << Config::ERROR_INVALID_DATE;
@@ -153,19 +155,33 @@ void HandleDateFirst(const std::string& token, std::istream& input, std::ostream
         output << (d1 - d2) << Config::RESULT_DAYS_SUFFIX << std::endl;
     }
     else if (op == Config::OPERATOR_EQUAL)
+    {
         output << (d1 == d2 ? Config::RESULT_TRUE : Config::RESULT_FALSE) << std::endl;
+    }
     else if (op == Config::OPERATOR_NOT_EQUAL)
+    {
         output << (d1 != d2 ? Config::RESULT_TRUE : Config::RESULT_FALSE) << std::endl;
+    }
     else if (op == Config::OPERATOR_LESS)
+    {
         output << (d1 < d2 ? Config::RESULT_TRUE : Config::RESULT_FALSE) << std::endl;
+    }
     else if (op == Config::OPERATOR_GREATER)
+    {
         output << (d1 > d2 ? Config::RESULT_TRUE : Config::RESULT_FALSE) << std::endl;
+    }
     else if (op == Config::OPERATOR_LESS_EQUAL)
+    {
         output << (d1 <= d2 ? Config::RESULT_TRUE : Config::RESULT_FALSE) << std::endl;
+    }
     else if (op == Config::OPERATOR_GREATER_EQUAL)
+    {
         output << (d1 >= d2 ? Config::RESULT_TRUE : Config::RESULT_FALSE) << std::endl;
+    }
     else
+    {
         output << Config::ERROR_INVALID_OPERATOR;
+    }
 }
 
 void CDateController::ProcessCommands(std::istream& input, std::ostream& output)
