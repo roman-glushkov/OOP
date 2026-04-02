@@ -163,42 +163,6 @@ bool CDate::IsValid() const
     return true;
 }
 
-CDate& CDate::operator++()
-{
-    if (IsValid())
-    {
-        ++m_timestamp;
-        if (!IsValid())
-            m_timestamp = Config::INVALID_TIMESTAMP;
-    }
-    return *this;
-}
-
-CDate CDate::operator++(int)
-{
-    CDate tmp = *this;
-    ++(*this);
-    return tmp;
-}
-
-CDate& CDate::operator--()
-{
-    if (IsValid())
-    {
-        --m_timestamp;
-        if (m_timestamp < Config::MIN_TIMESTAMP || !IsValid())
-            m_timestamp = Config::INVALID_TIMESTAMP;
-    }
-    return *this;
-}
-
-CDate CDate::operator--(int)
-{
-    CDate tmp = *this;
-    --(*this);
-    return tmp;
-}
-
 CDate CDate::operator+(int days) const
 {
     if (!IsValid())
@@ -228,6 +192,32 @@ int CDate::operator-(const CDate& other) const
     if (!IsValid() || !other.IsValid())
         return Config::ZERO;
     return m_timestamp - other.m_timestamp;
+}
+
+CDate& CDate::operator++()
+{
+    *this = *this + 1;
+    return *this;
+}
+
+CDate CDate::operator++(int)
+{
+    CDate tmp = *this;
+    *this = *this + 1;
+    return tmp;
+}
+
+CDate& CDate::operator--()
+{
+    *this = *this - 1;
+    return *this;
+}
+
+CDate CDate::operator--(int)
+{
+    CDate tmp = *this;
+    *this = *this - 1;
+    return tmp;
 }
 
 CDate& CDate::operator+=(int days)

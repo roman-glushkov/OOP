@@ -27,15 +27,14 @@ public:
     WeekDay GetWeekDay() const;
 
     bool IsValid() const;
-
+    CDate operator+(int days) const;
+    CDate operator-(int days) const;
     CDate& operator++();
     CDate operator++(int);
     CDate& operator--();
     CDate operator--(int);
 
-    CDate operator+(int days) const;
     friend CDate operator+(int days, const CDate& date);
-    CDate operator-(int days) const;
     int operator-(const CDate& other) const;
 
     CDate& operator+=(int days);

@@ -281,3 +281,38 @@ TEST_CASE("Controller error handling")
         CHECK(out.str().empty());
     }
 }
+
+TEST_CASE("dop tests ProcessComand")
+{
+    SECTION("28.02.2020 + 2")
+    {
+        std::istringstream in("28.02.2020 + 2");
+        std::ostringstream out;
+        CDateController::ProcessCommands(in, out);
+        CHECK(out.str() == "01.03.2020 (Day:1, Month:3, Year:2020, WeekDay:0)\n");
+    }
+    
+    SECTION("01.03.2020 - 2")
+    {
+        std::istringstream in("01.03.2020 - 2");
+        std::ostringstream out;
+        CDateController::ProcessCommands(in, out);
+        CHECK(out.str() == "28.02.2020 (Day:28, Month:2, Year:2020, WeekDay:5)\n");
+    }
+    
+    SECTION("31.12.2019 + 365")
+    {
+        std::istringstream in("31.12.2019 + 365");
+        std::ostringstream out;
+        CDateController::ProcessCommands(in, out);
+        CHECK(out.str() == "30.12.2020 (Day:30, Month:12, Year:2020, WeekDay:3)\n");
+    }
+    
+    SECTION("30.12.2020 - 365")
+    {
+        std::istringstream in("30.12.2020 - 365");
+        std::ostringstream out;
+        CDateController::ProcessCommands(in, out);
+        CHECK(out.str() == "31.12.2019 (Day:31, Month:12, Year:2019, WeekDay:2)\n");
+    }
+}
