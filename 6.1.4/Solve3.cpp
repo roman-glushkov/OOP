@@ -1,10 +1,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <algorithm>
-
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
+#include "Config.h"
 
 struct EquationRoots3
 {
@@ -14,39 +11,39 @@ struct EquationRoots3
 
 static double solveCubicCardano(double a, double b, double c, double d, double roots[])
 {
-    if (a == 0)
-        throw std::invalid_argument("Coefficient at x^3 cannot be zero");
+    if (a == Config::ZERO)
+        throw std::invalid_argument(Config::ERROR_COEFFICIENT_ZERO);
     
     double A = b / a;
     double B = c / a;
     double C = d / a;
     
-    double p = B - A*A / 3;
-    double q = (2*A*A*A) / 27 - (A*B) / 3 + C;
+    double p = B - A * A / Config::THREE;
+    double q = (Config::TWO * A * A * A) / Config::DIV_BY_27 - (A * B) / Config::THREE + C;
     
-    double discriminant = (q*q) / 4 + (p*p*p) / 27;
+    double discriminant = (q * q) / Config::FOUR + (p * p * p) / Config::DIV_BY_27;
     
-    int numRoots = 0;
+    int numRoots = Config::ZERO;
     
-    if (discriminant > 1e-12)
+    if (discriminant > Config::EPSILON)
     {
         double sqrtD = sqrt(discriminant);
-        double u = cbrt(-q/2 + sqrtD);
-        double v = cbrt(-q/2 - sqrtD);
+        double u = cbrt(-q / Config::TWO + sqrtD);
+        double v = cbrt(-q / Config::TWO - sqrtD);
         double y1 = u + v;
-        double x1 = y1 - A/3;
+        double x1 = y1 - A / Config::THREE;
         roots[numRoots++] = x1;
     }
-    else if (fabs(discriminant) < 1e-12)
+    else if (fabs(discriminant) < Config::EPSILON)
     {
-        double u = cbrt(-q/2);
-        double y1 = 2*u;
+        double u = cbrt(-q / Config::TWO);
+        double y1 = Config::TWO * u;
         double y2 = -u;
         
-        double x1 = y1 - A/3;
-        double x2 = y2 - A/3;
+        double x1 = y1 - A / Config::THREE;
+        double x2 = y2 - A / Config::THREE;
         
-        if (fabs(x1 - x2) > 1e-9)
+        if (fabs(x1 - x2) > Config::ROUNDING_EPSILON)
         {
             roots[numRoots++] = x1;
             roots[numRoots++] = x2;
@@ -58,15 +55,15 @@ static double solveCubicCardano(double a, double b, double c, double d, double r
     }
     else
     {
-        double r = sqrt(-p*p*p/27);
-        double phi = acos(-q/(2*r));
-        double y1 = 2 * cbrt(r) * cos(phi/3);
-        double y2 = 2 * cbrt(r) * cos((phi + 2*M_PI)/3);
-        double y3 = 2 * cbrt(r) * cos((phi + 4*M_PI)/3);
+        double r = sqrt(-p * p * p / Config::DIV_BY_27);
+        double phi = acos(-q / (Config::TWO * r));
+        double y1 = Config::TWO * cbrt(r) * cos(phi / Config::THREE);
+        double y2 = Config::TWO * cbrt(r) * cos((phi + Config::TWO_PI) / Config::THREE);
+        double y3 = Config::TWO * cbrt(r) * cos((phi + Config::FOUR_PI) / Config::THREE);
         
-        double x1 = y1 - A/3;
-        double x2 = y2 - A/3;
-        double x3 = y3 - A/3;
+        double x1 = y1 - A / Config::THREE;
+        double x2 = y2 - A / Config::THREE;
+        double x3 = y3 - A / Config::THREE;
         
         roots[numRoots++] = x1;
         roots[numRoots++] = x2;
@@ -76,21 +73,21 @@ static double solveCubicCardano(double a, double b, double c, double d, double r
     std::sort(roots, roots + numRoots);
 
     int uniqueCount = numRoots;
-    for (int i = 0; i < uniqueCount - 1; i++)
+    for (int i = Config::ZERO; i < uniqueCount - Config::ONE; i++)
     {
-        if (fabs(roots[i] - roots[i+1]) < 1e-9)
+        if (fabs(roots[i] - roots[i + Config::ONE]) < Config::ROUNDING_EPSILON)
         {
-            for (int j = i+1; j < uniqueCount - 1; j++)
-                roots[j] = roots[j+1];
+            for (int j = i + Config::ONE; j < uniqueCount - Config::ONE; j++)
+                roots[j] = roots[j + Config::ONE];
             uniqueCount--;
             i--;
         }
     }
     
-    for (int i = 0; i < uniqueCount; i++)
+    for (int i = Config::ZERO; i < uniqueCount; i++)
     {
         double rounded = round(roots[i]);
-        if (fabs(roots[i] - rounded) < 1e-9)
+        if (fabs(roots[i] - rounded) < Config::ROUND_THRESHOLD)
         {
             roots[i] = rounded;
         }

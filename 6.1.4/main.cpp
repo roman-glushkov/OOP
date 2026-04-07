@@ -1,13 +1,6 @@
 #include <iostream>
 #include <stdexcept>
-
-struct EquationRoots3
-{
-    int numRoots;
-    double roots[3];
-};
-
-EquationRoots3 Solve3(double a, double b, double c, double d);
+#include "Solve3.h"
 
 int main()
 {
@@ -20,17 +13,17 @@ int main()
             EquationRoots3 res = Solve3(a, b, c, d);
             
             std::cout << res.numRoots;
-            for (int i = 0; i < res.numRoots; i++)
+            for (int i = Config::ZERO; i < res.numRoots; i++)
             {
-                std::cout << " " << res.roots[i];
+                std::cout << Config::SPACE << res.roots[i];
             }
             std::cout << std::endl;
         }
         catch (const std::invalid_argument& ex)
         {
-            std::cout << "Error: " << ex.what() << std::endl;
+            std::cout << Config::ERROR_PREFIX << ex.what() << std::endl;
         }
     }
     
-    return 0;
+    return Config::ZERO;
 }

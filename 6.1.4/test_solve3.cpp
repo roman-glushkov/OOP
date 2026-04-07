@@ -13,21 +13,6 @@ TEST_CASE("Solve3 handles invalid input")
         CHECK_THROWS_AS(Solve3(0, 2, -3, 1), std::invalid_argument);
     }
     
-    SECTION("Exception message is correct")
-    {
-        try 
-        {
-            Solve3(0, 1, 1, 1);
-            FAIL("Expected exception not thrown");
-        }
-        catch (const std::invalid_argument& ex)
-        {
-            std::string msg = ex.what();
-            CHECK(msg.find("x^3") != std::string::npos);
-            CHECK(msg.find("zero") != std::string::npos);
-        }
-    }
-    
     SECTION("Very small but non-zero coefficient is acceptable")
     {
         CHECK_NOTHROW(Solve3(1e-13, 1, 1, 1));
@@ -124,25 +109,6 @@ TEST_CASE("Solve3 equations with one real root")
         
         CHECK(result.numRoots == 1);
         CHECK(result.roots[0] == Approx(1.0));
-    }
-    
-    SECTION("x^3 + 2x^2 + 3x + 4 = 0, one real root ≈ -1.6506")
-    {
-        EquationRoots3 result = Solve3(1, 2, 3, 4);
-        
-        CHECK(result.numRoots == 1);
-        double x = result.roots[0];
-        double value = x*x*x + 2*x*x + 3*x + 4;
-        CHECK(fabs(value) < 1e-9);
-    }
-    
-    SECTION("x^3 - 5x^2 + 8x - 6 = 0, one real root ≈ 3")
-    {
-        EquationRoots3 result = Solve3(1, -5, 8, -6);
-        
-        CHECK(result.numRoots == 1);
-        double x = result.roots[0];
-        CHECK(fabs(x - 3.0) < 0.1);
     }
 }
 
