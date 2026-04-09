@@ -10,6 +10,8 @@ namespace Config
 
     const double ROUND_THRESHOLD = 1e-9;
 
+    const double NEGATIVE_ZERO = -0.0;
+    const double POSITIVE_ZERO = 0.0;
     const int ZERO = 0;
     const int ONE = 1;
     const int TWO = 2;

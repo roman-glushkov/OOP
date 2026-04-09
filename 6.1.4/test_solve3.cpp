@@ -191,3 +191,31 @@ TEST_CASE("Solve3 sorting and duplicate removal")
         CHECK(result.numRoots == 2);
     }
 }
+
+TEST_CASE("Solve3 special cases: zero coefficients")
+{
+    SECTION("x^3 = 0, roots: 0")
+    {
+        EquationRoots3 result = Solve3(1, 0, 0, 0);
+        
+        CHECK(result.numRoots == 1);
+        CHECK(result.roots[0] == Approx(0.0));
+    }
+    
+    SECTION("x^3 + x^2 = 0, roots: -1, 0, 0")
+    {
+        EquationRoots3 result = Solve3(1, 1, 0, 0);
+
+        CHECK(result.numRoots == 2);
+        CHECK(result.roots[0] == Approx(-1.0));
+        CHECK(result.roots[1] == Approx(0.0));
+    }
+    
+    SECTION("x^3 + x^2 + x = 0, roots: 0, complex roots")
+    {
+        EquationRoots3 result = Solve3(1, 1, 1, 0);
+
+        CHECK(result.numRoots == 1);
+        CHECK(result.roots[0] == Approx(0.0));
+    }
+}

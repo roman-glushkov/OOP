@@ -72,18 +72,10 @@ static double solveCubicCardano(double a, double b, double c, double d, double r
     
     std::sort(roots, roots + numRoots);
 
-    int uniqueCount = numRoots;
-    for (int i = Config::ZERO; i < uniqueCount - Config::ONE; i++)
-    {
-        if (fabs(roots[i] - roots[i + Config::ONE]) < Config::ROUNDING_EPSILON)
-        {
-            for (int j = i + Config::ONE; j < uniqueCount - Config::ONE; j++)
-                roots[j] = roots[j + Config::ONE];
-            uniqueCount--;
-            i--;
-        }
-    }
-    
+    int uniqueCount = std::unique(roots, roots + numRoots, [](double a, double b) {
+            return fabs(a - b) < Config::ROUNDING_EPSILON;
+        }) - roots;
+
     for (int i = Config::ZERO; i < uniqueCount; i++)
     {
         double rounded = round(roots[i]);
@@ -91,8 +83,10 @@ static double solveCubicCardano(double a, double b, double c, double d, double r
         {
             roots[i] = rounded;
         }
+        
+        roots[i] = (roots[i] == -0.0) ? 0.0 : roots[i];
     }
-    
+
     return uniqueCount;
 }
 

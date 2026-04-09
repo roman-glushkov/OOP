@@ -1,4 +1,6 @@
 #include <iostream>
+#include <iterator>
+#include <algorithm> 
 #include <stdexcept>
 #include "Solve3.h"
 
@@ -12,11 +14,7 @@ int main()
         {
             EquationRoots3 res = Solve3(a, b, c, d);
             
-            std::cout << res.numRoots;
-            for (int i = Config::ZERO; i < res.numRoots; i++)
-            {
-                std::cout << Config::SPACE << res.roots[i];
-            }
+            std::copy(res.roots, res.roots + res.numRoots,std::ostream_iterator<double>(std::cout, " "));
             std::cout << std::endl;
         }
         catch (const std::invalid_argument& ex)
