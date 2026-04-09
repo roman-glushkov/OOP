@@ -1,14 +1,14 @@
 #define CONFIG_H
+#include <numbers>
+#include <float.h>
+
 
 namespace Config
 {
-    const double EPSILON = 1e-12;
-    const double ROUNDING_EPSILON = 1e-9;
-
-    const double TWO_PI = 2.0 * 3.14159265358979323846;
-    const double FOUR_PI = 4.0 * 3.14159265358979323846;
-
-    const double ROUND_THRESHOLD = 1e-9;
+    const double EPSILON = DBL_EPSILON;
+    const double PI = std::numbers::pi;
+    const double TWO_PI = 2.0 * PI;
+    const double FOUR_PI = 4.0 * PI;
 
     const double NEGATIVE_ZERO = -0.0;
     const double POSITIVE_ZERO = 0.0;
@@ -24,6 +24,9 @@ namespace Config
     const int DIV_BY_2 = 2;
     const int DIV_BY_3 = 3;
     const int DIV_BY_27 = 27;
+
+    const double ROUNDING_EPSILON = 1e-9;
+    const double ROUND_THRESHOLD = 1e-9;
 
     const char* const ERROR_COEFFICIENT_ZERO = "Coefficient at x^3 cannot be zero";
     const char* const ERROR_PREFIX = "Error: ";
