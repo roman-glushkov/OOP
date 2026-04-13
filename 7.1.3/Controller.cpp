@@ -6,12 +6,28 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <stdexcept>
 
 struct Athlete
 {
     std::string fullName;
     double height;
     double weight;
+    
+    Athlete(const std::string& name, double h, double w)
+        : fullName(name), height(h), weight(w)
+    {
+        if (h <= 0)
+        {
+            throw std::invalid_argument(Config::ERROR_HEIGHT_POSITIVE);
+        }
+        if (w <= 0)
+        {
+            throw std::invalid_argument(Config::ERROR_WEIGHT_POSITIVE);
+        }
+    }
+    
+    Athlete() : fullName(""), height(0), weight(0) {}
 };
 
 struct CompareByHeight
@@ -42,19 +58,31 @@ static std::vector<Athlete> LoadAthletes()
     }
     
     std::string line;
+    int lineNumber = 1;
+    
     while (std::getline(file, line))
     {
         if (line.empty()) continue;
         
         std::stringstream ss(line);
-        Athlete a;
-
-        std::getline(ss, a.fullName, Config::DELIMITER);
-        ss >> a.height;
+        std::string name;
+        double height, weight;
+        
+        std::getline(ss, name, Config::DELIMITER);
+        ss >> height;
         ss.ignore(Config::IGNORE_COUNT, Config::DELIMITER);
-        ss >> a.weight;
-
-        athletes.push_back(a);
+        ss >> weight;
+        
+        try
+        {
+            athletes.push_back(Athlete(name, height, weight));
+        }
+        catch (const std::invalid_argument& e)
+        {
+            std::cout << Config::ERROR_PREFIX << "Line " << lineNumber << ": " << e.what() << std::endl;
+        }
+        
+        lineNumber++;
     }
     
     return athletes;

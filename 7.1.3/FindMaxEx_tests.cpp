@@ -1,50 +1,104 @@
 #define CATCH_CONFIG_MAIN
 #include "../catch2/catch.hpp"
-
 #include "FindMaxEx.h"
 #include "Controller.h"
 #include "Config.h"
-
 #include <vector>
 #include <string>
-#include <sstream>
+#include <stdexcept>
 #include <fstream>
+#include <sstream>
 
-// -------------------- BASIC TYPES --------------------
-
-TEST_CASE("FindMaxEx with integers")
+struct TestAthlete
 {
-    std::vector<int> arr = {1, 5, 3, 9, 2};
+    std::string name;
+    double height;
+    double weight;
+};
+
+TEST_CASE("Empty array")
+{
+    std::vector<int> arr;
+    int maxValue = 42;
+
+    bool result = FindMaxEx(arr, maxValue, [](int a, int b) { return a < b; });
+
+    CHECK(result == false);
+    CHECK(maxValue == 42);
+}
+
+TEST_CASE("Single element")
+{
+    std::vector<int> arr = {100};
     int maxValue = 0;
 
-    bool result = FindMaxEx(arr, maxValue, [](int a, int b)
-    {
-        return a < b;
-    });
+    bool result = FindMaxEx(arr, maxValue, [](int a, int b) { return a < b; });
 
     CHECK(result == true);
-    CHECK(maxValue == 9);
+    CHECK(maxValue == 100);
 }
 
-TEST_CASE("FindMaxEx with doubles")
+TEST_CASE("Integers")
 {
-    std::vector<double> arr = {1.1, 5.5, 3.3};
-    double maxValue = 0;
-
-    bool result = FindMaxEx(arr, maxValue, [](double a, double b)
+    SECTION("General case")
     {
-        return a < b;
-    });
+        std::vector<int> arr = {5, -2, 8, 1, 9, -3};
+        int maxValue = 0;
+
+        bool result = FindMaxEx(arr, maxValue, [](int a, int b) { return a < b; });
+
+        CHECK(result == true);
+        CHECK(maxValue == 9);
+    }
+
+    SECTION("All equal")
+    {
+        std::vector<int> arr = {7, 7, 7, 7};
+        int maxValue = 0;
+
+        bool result = FindMaxEx(arr, maxValue, [](int a, int b) { return a < b; });
+
+        CHECK(result == true);
+        CHECK(maxValue == 7);
+    }
+
+    SECTION("Sorted ascending")
+    {
+        std::vector<int> arr = {1, 2, 3, 4, 5};
+        int maxValue = 0;
+
+        bool result = FindMaxEx(arr, maxValue, [](int a, int b) { return a < b; });
+
+        CHECK(result == true);
+        CHECK(maxValue == 5);
+    }
+
+    SECTION("Sorted descending")
+    {
+        std::vector<int> arr = {5, 4, 3, 2, 1};
+        int maxValue = 0;
+
+        bool result = FindMaxEx(arr, maxValue, [](int a, int b) { return a < b; });
+
+        CHECK(result == true);
+        CHECK(maxValue == 5);
+    }
+}
+
+TEST_CASE("Doubles")
+{
+    std::vector<double> arr = {1.5, 3.7, 2.1, 5.9, 4.2};
+    double maxValue = 0.0;
+
+    bool result = FindMaxEx(arr, maxValue, [](double a, double b) { return a < b; });
 
     CHECK(result == true);
-    CHECK(maxValue == Approx(5.5));
+    CHECK(maxValue == Approx(5.9));
 }
 
-// -------------------- STRINGS --------------------
-
-TEST_CASE("FindMaxEx with strings (lexicographical)")
+TEST_CASE("Strings")
 {
-    std::vector<std::string> arr = {"apple", "banana", "pear"};
+    std::vector<std::string> arr = {"apple", "banana", "pear", "grape"};
     std::string maxValue;
 
     bool result = FindMaxEx(arr, maxValue, [](const std::string& a, const std::string& b)
@@ -56,131 +110,74 @@ TEST_CASE("FindMaxEx with strings (lexicographical)")
     CHECK(maxValue == "pear");
 }
 
-// -------------------- EDGE CASES --------------------
-
-TEST_CASE("Empty array")
+TEST_CASE("Reverse comparator")
 {
-    std::vector<int> arr;
-    int maxValue = 42;
+    std::vector<int> arr = {10, 20, 5, 30, 15};
+    int minValue = 0;
 
-    bool result = FindMaxEx(arr, maxValue, [](int a, int b)
+    bool result = FindMaxEx(arr, minValue, [](int a, int b)
     {
-        return a < b;
-    });
-
-    CHECK(result == false);
-    CHECK(maxValue == 42); // commit-or-rollback
-}
-
-TEST_CASE("Single element")
-{
-    std::vector<int> arr = {7};
-    int maxValue = 0;
-
-    bool result = FindMaxEx(arr, maxValue, [](int a, int b)
-    {
-        return a < b;
+        return a > b;
     });
 
     CHECK(result == true);
-    CHECK(maxValue == 7);
+    CHECK(minValue == 5);
 }
 
-TEST_CASE("All elements equal")
+TEST_CASE("Athlete by height")
 {
-    std::vector<int> arr = {5, 5, 5, 5};
-    int maxValue = 0;
-
-    bool result = FindMaxEx(arr, maxValue, [](int a, int b)
+    std::vector<TestAthlete> arr =
     {
-        return a < b;
-    });
-
-    CHECK(result == true);
-    CHECK(maxValue == 5);
-}
-
-// -------------------- CUSTOM COMPARATORS --------------------
-
-TEST_CASE("Find minimum using reversed comparator")
-{
-    std::vector<int> arr = {10, 20, 5, 30};
-    int value = 0;
-
-    bool result = FindMaxEx(arr, value, [](int a, int b)
-    {
-        return a > b; // reverse logic
-    });
-
-    CHECK(result == true);
-    CHECK(value == 5);
-}
-
-// -------------------- CUSTOM TYPE --------------------
-
-struct Athlete
-{
-    std::string name;
-    double height;
-    double weight;
-};
-
-TEST_CASE("FindMaxEx with Athlete by height")
-{
-    std::vector<Athlete> arr =
-    {
-        {"A", 1.7, 60},
-        {"B", 1.9, 80},
-        {"C", 1.8, 70}
+        {"Ivanov", 1.85, 80.5},
+        {"Petrov", 1.92, 95.0},
+        {"Sidorov", 1.68, 58.7}
     };
 
-    Athlete result;
+    TestAthlete result;
 
-    bool found = FindMaxEx(arr, result, [](const Athlete& a, const Athlete& b)
+    bool found = FindMaxEx(arr, result, [](const TestAthlete& a, const TestAthlete& b)
     {
         return a.height < b.height;
     });
 
     CHECK(found == true);
-    CHECK(result.name == "B");
+    CHECK(result.name == "Petrov");
+    CHECK(result.height == Approx(1.92));
 }
 
-TEST_CASE("FindMaxEx with Athlete by weight")
+TEST_CASE("Athlete by weight")
 {
-    std::vector<Athlete> arr =
+    std::vector<TestAthlete> arr =
     {
-        {"A", 1.7, 60},
-        {"B", 1.9, 80},
-        {"C", 1.8, 90}
+        {"Ivanov", 1.85, 80.5},
+        {"Petrov", 1.92, 95.0},
+        {"Sidorov", 1.68, 58.7}
     };
 
-    Athlete result;
+    TestAthlete result;
 
-    bool found = FindMaxEx(arr, result, [](const Athlete& a, const Athlete& b)
+    bool found = FindMaxEx(arr, result, [](const TestAthlete& a, const TestAthlete& b)
     {
         return a.weight < b.weight;
     });
 
     CHECK(found == true);
-    CHECK(result.name == "C");
+    CHECK(result.name == "Petrov");
+    CHECK(result.weight == Approx(95.0));
 }
 
-// -------------------- EXCEPTION SAFETY --------------------
-
-struct ThrowOnAssign
+TEST_CASE("Strong exception guarantee")
 {
-    int value;
-
-    ThrowOnAssign(int v = 0) : value(v) {}
-
-    ThrowOnAssign& operator=(const ThrowOnAssign&)
+    struct ThrowOnAssign
     {
-        throw std::runtime_error("Assignment failed");
-    }
-};
+        int value;
+        ThrowOnAssign(int v = 0) : value(v) {}
+        ThrowOnAssign& operator=(const ThrowOnAssign&)
+        {
+            throw std::runtime_error("assignment failed");
+        }
+    };
 
-TEST_CASE("Strong exception guarantee (commit-or-rollback)")
-{
     std::vector<ThrowOnAssign> arr = {1, 2, 3};
     ThrowOnAssign maxValue(999);
 
@@ -192,62 +189,81 @@ TEST_CASE("Strong exception guarantee (commit-or-rollback)")
         std::runtime_error
     );
 
-    CHECK(maxValue.value == 999); // не изменился
+    CHECK(maxValue.value == 999);
 }
 
-// -------------------- CONTROLLER TESTS --------------------
-
-TEST_CASE("Controller full process - valid file")
+TEST_CASE("Controller")
 {
-    // создаём тестовый файл
-    std::ofstream file(Config::DATABASE_FILE);
-    file << "A|1.5|50\n";
-    file << "B|2.0|80\n";
-    file << "C|1.8|90\n";
-    file.close();
+    SECTION("Valid file")
+    {
+        std::ofstream file(Config::DATABASE_FILE);
+        file << "Ivanov|1.85|80.5\n";
+        file << "Petrov|1.92|95.0\n";
+        file << "Sidorov|1.68|58.7\n";
+        file.close();
 
-    std::ostringstream output;
-    std::streambuf* oldCout = std::cout.rdbuf(output.rdbuf());
+        std::ostringstream output;
+        std::streambuf* old = std::cout.rdbuf(output.rdbuf());
 
-    Controller::ProcessCommands();
+        Controller::ProcessCommands();
 
-    std::cout.rdbuf(oldCout);
+        std::cout.rdbuf(old);
 
-    std::string result = output.str();
+        std::string result = output.str();
 
-    CHECK(result.find("Searching athlete with maximum height") != std::string::npos);
-    CHECK(result.find("Searching athlete with maximum weight") != std::string::npos);
-    CHECK(result.find("B") != std::string::npos); // tallest
-    CHECK(result.find("C") != std::string::npos); // heaviest
-}
+        CHECK(result.find(Config::MSG_SEARCH_HEIGHT) != std::string::npos);
+        CHECK(result.find(Config::MSG_SEARCH_WEIGHT) != std::string::npos);
+        CHECK(result.find("Petrov") != std::string::npos);
+    }
 
-TEST_CASE("Controller - empty file")
-{
-    std::ofstream file(Config::DATABASE_FILE);
-    file.close();
+    SECTION("Invalid data validation")
+    {
+        std::ofstream file(Config::DATABASE_FILE);
+        file << "Invalid1|-1.5|50\n";
+        file << "Invalid2|1.8|-10\n";
+        file << "Valid|1.9|90\n";
+        file.close();
 
-    std::ostringstream output;
-    std::streambuf* oldCout = std::cout.rdbuf(output.rdbuf());
+        std::ostringstream output;
+        std::streambuf* old = std::cout.rdbuf(output.rdbuf());
 
-    Controller::ProcessCommands();
+        Controller::ProcessCommands();
 
-    std::cout.rdbuf(oldCout);
+        std::cout.rdbuf(old);
 
-    CHECK(output.str().find(Config::ERROR_EMPTY_ARRAY) != std::string::npos);
-}
+        std::string result = output.str();
 
-TEST_CASE("Controller - file not found")
-{
-    std::remove(Config::DATABASE_FILE);
+        CHECK(result.find(Config::ERROR_HEIGHT_POSITIVE) != std::string::npos);
+        CHECK(result.find(Config::ERROR_WEIGHT_POSITIVE) != std::string::npos);
+        CHECK(result.find("Valid") != std::string::npos);
+    }
 
-    std::ostringstream output;
-    std::streambuf* oldCout = std::cout.rdbuf(output.rdbuf());
+    SECTION("File not found")
+    {
+        std::remove(Config::DATABASE_FILE);
 
-    Controller::ProcessCommands();
+        std::ostringstream output;
+        std::streambuf* old = std::cout.rdbuf(output.rdbuf());
 
-    std::cout.rdbuf(oldCout);
+        Controller::ProcessCommands();
 
-    std::string result = output.str();
+        std::cout.rdbuf(old);
 
-    CHECK(result.find(Config::ERROR_FILE_NOT_OPEN) != std::string::npos);
+        CHECK(output.str().find(Config::ERROR_FILE_NOT_OPEN) != std::string::npos);
+    }
+
+    SECTION("Empty file")
+    {
+        std::ofstream file(Config::DATABASE_FILE);
+        file.close();
+
+        std::ostringstream output;
+        std::streambuf* old = std::cout.rdbuf(output.rdbuf());
+
+        Controller::ProcessCommands();
+
+        std::cout.rdbuf(old);
+
+        CHECK(output.str().find(Config::ERROR_EMPTY_ARRAY) != std::string::npos);
+    }
 }
